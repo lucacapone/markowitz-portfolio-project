@@ -119,3 +119,85 @@ Un elemento particolarmente significativo è l'assenza di correlazioni molto ele
 Questi risultati confermano la presenza di benefici di diversificazione all'interno dell'universo di titoli considerato. La combinazione di imprese appartenenti a settori differenti consente infatti di ridurre l'esposizione a shock specifici di singole società o comparti economici. Le correlazioni contenute indicano che i rendimenti non si muovono in modo perfettamente coordinato, rendendo possibile una riduzione del rischio complessivo attraverso un'adeguata scelta dei pesi di portafoglio.
 
 Nel complesso, la struttura delle correlazioni suggerisce che i titoli selezionati siano appropriati per la successiva costruzione di portafogli secondo l'approccio di Markowitz. L'eterogeneità settoriale e l'assenza di relazioni lineari eccessivamente elevate offrono una base empirica favorevole per l'analisi media-varianza. La matrice è inoltre rappresentata graficamente nella heatmap delle correlazioni generata durante l'analisi, salvata nel file `figures/correlation_heatmap.png`, che consente di visualizzare in modo immediato l'intensità relativa delle relazioni tra i rendimenti dei titoli.
+
+# 6. Applicazione del modello di Markowitz
+
+L'applicazione empirica del modello di Markowitz richiede, in primo luogo, la trasformazione delle serie storiche dei prezzi rettificati in rendimenti giornalieri e la successiva stima dei parametri fondamentali dell'analisi media-varianza. Il rendimento atteso di ciascun titolo è stato stimato come media aritmetica dei rendimenti giornalieri osservati nel campione. Tale grandezza rappresenta una misura sintetica della performance media storica e costituisce il punto di partenza per il calcolo del rendimento atteso di ogni portafoglio ammissibile.
+
+Poiché l'analisi è espressa su base annua, i rendimenti medi giornalieri sono stati annualizzati assumendo 252 giorni di negoziazione in un anno. Indicando con \(\mu_{daily}\) il rendimento medio giornaliero, il rendimento annuo atteso è stato calcolato secondo la seguente relazione:
+
+$$
+\mu_{ann} = 252 \cdot \mu_{daily}
+$$
+
+La seconda componente essenziale del modello è la matrice di covarianza dei rendimenti. Essa è stata stimata a partire dalle serie dei rendimenti giornalieri dei sei titoli considerati e consente di incorporare non soltanto la volatilità individuale di ciascuna attività, ma anche il grado di co-movimento tra le diverse attività finanziarie. Nel modello di Markowitz, infatti, il rischio complessivo del portafoglio dipende dalla matrice di covarianza e dai pesi assegnati ai titoli, secondo la relazione \(\sigma_p^2 = w^T \Sigma w\). La matrice di covarianza giornaliera è stata quindi annualizzata moltiplicandola per 252, coerentemente con la frequenza giornaliera dei dati.
+
+Per ogni portafoglio, la volatilità giornaliera è stata ottenuta come deviazione standard dei rendimenti di portafoglio. Anche questa misura è stata espressa su base annua mediante la radice quadrata del numero di giorni di negoziazione. Indicando con \(\sigma_{daily}\) la volatilità giornaliera, la volatilità annua è stata calcolata come:
+
+$$
+\sigma_{ann} = \sqrt{252} \cdot \sigma_{daily}
+$$
+
+Successivamente, sono stati simulati 10.000 portafogli casuali. Per ciascuna simulazione è stato generato un vettore di pesi assegnati ai sei titoli, imponendo che la somma dei pesi fosse pari a uno. Inoltre, è stato escluso il ricorso alle vendite allo scoperto: di conseguenza, ogni peso di portafoglio è vincolato a essere compreso tra 0 e 1. Formalmente, i vincoli imposti sono \(\sum_{i=1}^{n} w_i = 1\) e \(0 \leq w_i \leq 1\) per ogni attività \(i\). Tali condizioni descrivono un portafoglio long-only, nel quale l'investitore può detenere soltanto posizioni positive o nulle nei titoli considerati.
+
+Per ogni portafoglio simulato sono stati calcolati il rendimento atteso annuo, la volatilità annua e lo Sharpe Ratio. In questa analisi il tasso privo di rischio è assunto pari a zero; pertanto, lo Sharpe Ratio misura il rendimento atteso per unità di rischio totale sostenuto. Indicando con \(\mu_p\) il rendimento atteso del portafoglio e con \(\sigma_p\) la sua volatilità, l'indicatore è definito come:
+
+$$
+SR = \frac{\mu_p}{\sigma_p}
+$$
+
+La costruzione della frontiera efficiente è stata realizzata individuando, tra le combinazioni ammissibili, i portafogli che presentano il livello minimo di volatilità per ciascun rendimento atteso oppure, in modo equivalente, il rendimento atteso massimo per ciascun livello di rischio. La frontiera efficiente rappresenta quindi l'insieme delle allocazioni dominanti nel piano rischio-rendimento. I portafogli collocati al di sotto di essa sono inefficienti, poiché esistono combinazioni alternative in grado di offrire un rendimento superiore a parità di volatilità oppure una volatilità inferiore a parità di rendimento atteso.
+
+# 7. Risultati
+
+## 7.1 Portafoglio a minima varianza
+
+Il portafoglio a minima varianza rappresenta l'allocazione che, tra quelle ammissibili, consente di ottenere la minore volatilità complessiva. I risultati stimati per tale portafoglio sono i seguenti:
+
+- Expected Return = 11.83%
+- Volatility = 12.75%
+- Sharpe Ratio = 0.928
+
+La composizione del portafoglio a minima varianza è riportata di seguito:
+
+- AAPL = 5.63%
+- JPM = 3.55%
+- KO = 37.79%
+- JNJ = 34.90%
+- XOM = 12.91%
+- BA = 5.22%
+
+La struttura dei pesi evidenzia una forte concentrazione relativa su Coca-Cola e Johnson & Johnson. Tale risultato è coerente con le caratteristiche empiriche osservate nelle sezioni precedenti: entrambi i titoli presentano una volatilità giornaliera inferiore rispetto alle altre attività del campione e appartengono a settori tradizionalmente difensivi, rispettivamente beni di consumo essenziali e sanità. In un problema di minimizzazione della varianza, attività caratterizzate da minore instabilità dei rendimenti tendono naturalmente a ricevere pesi più elevati, soprattutto quando consentono di ridurre il rischio complessivo senza compromettere eccessivamente il rendimento atteso.
+
+L'elevato peso attribuito a KO e JNJ non deve essere interpretato soltanto come conseguenza della loro bassa volatilità individuale, ma anche alla luce delle relazioni di covarianza con gli altri titoli. Sebbene la correlazione tra KO e JNJ sia la più elevata tra quelle osservate nel campione, essa rimane moderata e non elimina i benefici della diversificazione. La loro inclusione con pesi consistenti contribuisce pertanto a stabilizzare il portafoglio, compensando l'esposizione a titoli più ciclici o più volatili come AAPL, JPM, XOM e BA.
+
+## 7.2 Portafoglio con massimo Sharpe Ratio
+
+Il portafoglio con massimo Sharpe Ratio è l'allocazione che massimizza il rendimento atteso per unità di rischio, assumendo un tasso privo di rischio pari a zero. Esso non coincide necessariamente con il portafoglio meno rischioso, poiché l'obiettivo consiste nel migliorare il rapporto tra rendimento e volatilità. I risultati ottenuti sono i seguenti:
+
+- Expected Return = 15.28%
+- Volatility = 14.00%
+- Sharpe Ratio = 1.092
+
+La composizione del portafoglio con massimo Sharpe Ratio è la seguente:
+
+- AAPL = 15.68%
+- JPM = 14.75%
+- KO = 19.22%
+- JNJ = 22.98%
+- XOM = 27.31%
+- BA = 0.08%
+
+Rispetto al portafoglio a minima varianza, questa allocazione assegna un peso più elevato a titoli con maggiore contributo al rendimento atteso, in particolare Exxon Mobil, Apple e JPMorgan Chase. XOM riceve il peso maggiore, coerentemente con il rendimento medio più elevato osservato nel campione. Al tempo stesso, il portafoglio conserva una quota rilevante in KO e JNJ, che continuano a svolgere una funzione di stabilizzazione della volatilità complessiva.
+
+Boeing risulta quasi esclusa dal portafoglio con massimo Sharpe Ratio, con un peso pari allo 0.08%. Tale risultato riflette la combinazione sfavorevole tra rendimento medio storico negativo e volatilità elevata. In un'ottica media-varianza, un titolo con elevata dispersione dei rendimenti può essere incluso solo se offre un contributo adeguato al rendimento atteso oppure benefici di diversificazione sufficientemente rilevanti. Nel caso di BA, tali benefici non risultano sufficienti a compensare il profilo rischio-rendimento sfavorevole; di conseguenza, l'ottimizzazione tende ad assegnargli un peso pressoché nullo.
+
+## 7.3 Frontiera efficiente
+
+La frontiera efficiente sintetizza graficamente la relazione tra rischio e rendimento atteso per l'insieme dei portafogli ammissibili. Nel piano rischio-rendimento, ciascun portafoglio è rappresentato da una coppia formata dalla volatilità annua e dal rendimento annuo atteso. In generale, portafogli con rendimento atteso più elevato richiedono l'assunzione di un rischio maggiore, mentre portafogli con volatilità più contenuta tendono a offrire rendimenti attesi inferiori. Tuttavia, la relazione non è meccanica, poiché la diversificazione consente di modificare il rischio complessivo attraverso la combinazione di attività non perfettamente correlate.
+
+L'interpretazione della frontiera efficiente si fonda sul principio di dominanza media-varianza. I portafogli situati sulla frontiera sono efficienti perché, per un dato livello di volatilità, non esiste un'altra allocazione in grado di offrire un rendimento atteso superiore; analogamente, per un dato livello di rendimento atteso, non esiste un portafoglio con volatilità inferiore. I portafogli collocati al di sotto della frontiera sono invece inefficienti, poiché risultano dominati da combinazioni alternative più favorevoli.
+
+I benefici della diversificazione emergono dal fatto che la volatilità del portafoglio non è una semplice media ponderata delle volatilità individuali, ma dipende anche dalle covarianze tra i rendimenti. La presenza di correlazioni contenute tra i titoli selezionati permette di costruire portafogli con rischio inferiore rispetto a quello che si otterrebbe concentrando l'investimento in singole attività. In particolare, l'inclusione di titoli difensivi come KO e JNJ contribuisce a ridurre la variabilità complessiva, mentre titoli come XOM, AAPL e JPM possono accrescere il rendimento atteso quando inseriti con pesi coerenti con i vincoli di rischio.
+
+La figura `figures/efficient_frontier.png` rappresenta la frontiera efficiente generata dall'analisi. Essa consente di confrontare visivamente i 10.000 portafogli simulati con le allocazioni efficienti. I portafogli casuali occupano un'area più ampia del piano rischio-rendimento e includono molte combinazioni subottimali; la frontiera efficiente, invece, individua il bordo superiore di tale insieme, ossia le combinazioni che offrono le migliori opportunità disponibili. Il confronto tra portafogli simulati e portafogli efficienti mostra quindi come l'ottimizzazione di Markowitz consenta di selezionare allocazioni superiori rispetto a scelte casuali dei pesi, mantenendo i vincoli di assenza di vendite allo scoperto e di pesi compresi tra 0 e 1.

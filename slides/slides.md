@@ -107,7 +107,9 @@ rt = ln(Pt / Pt−1)
 * Boeing presenta rendimento medio negativo.
 * Coca-Cola e Johnson & Johnson risultano i titoli meno volatili.
 
-Nota figura: `figures/normalized_prices.png`, generata eseguendo `python src/02_descriptive_analysis.py` dalla root del progetto.
+![Prezzi normalizzati](../figures/normalized_prices.png)
+
+*Figura. Andamento dei prezzi normalizzati dei titoli analizzati.*
 
 ---
 
@@ -131,7 +133,9 @@ Nessuna coppia di titoli presenta correlazioni prossime all’unità.
 
 ⇒ Benefici significativi di diversificazione.
 
-Nota figura: `figures/correlation_heatmap.png`, generata eseguendo `python src/03_correlations.py` dalla root del progetto.
+![Heatmap delle correlazioni](../figures/correlation_heatmap.png)
+
+*Figura. Heatmap della matrice di correlazione dei rendimenti.*
 
 ---
 
@@ -192,7 +196,9 @@ La frontiera efficiente rappresenta l’insieme dei portafogli che:
 * benefici concreti della diversificazione;
 * presenza di portafogli efficienti superiori alle combinazioni casuali.
 
-Nota figura: `figures/efficient_frontier.png`, generata eseguendo `python src/04_markowitz_simulation.py` dalla root del progetto.
+![Frontiera efficiente](../figures/efficient_frontier.png)
+
+*Figura. Frontiera efficiente nel piano rischio-rendimento.*
 
 ---
 

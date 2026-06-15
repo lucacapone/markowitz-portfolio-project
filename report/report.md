@@ -8,7 +8,7 @@ La diversificazione svolge un ruolo rilevante nella gestione di tale relazione. 
 
 L'obiettivo di questo progetto è analizzare sei azioni appartenenti a settori differenti e costruire portafogli efficienti mediante il modello media-varianza di Markowitz. Il lavoro applica la teoria di portafoglio a un insieme diversificato di titoli azionari, stima le caratteristiche di rendimento e rischio sulla base di dati storici e fornisce il fondamento teorico per individuare portafogli che presentino combinazioni efficienti di rendimento atteso e rischio.
 
-# 2. Fondamenti teorici
+# 2. Richiami teorici
 
 Gli investimenti rischiosi sono attività i cui rendimenti futuri risultano incerti. Le azioni ordinarie sono rischiose perché prezzi e dividendi possono variare in risposta a fattori specifici dell'impresa, condizioni settoriali, variabili macroeconomiche, tassi di interesse, aspettative degli investitori e dinamiche generali di mercato. Poiché il payoff futuro non è noto con certezza, gli investitori devono valutare sia la remunerazione attesa derivante dal possesso dell'attività sia la variabilità dei possibili risultati rispetto a tale aspettativa.
 
@@ -45,6 +45,8 @@ $$
 La frontiera efficiente è l'insieme dei portafogli che offrono il rendimento atteso più elevato per ciascun livello di rischio oppure, in modo equivalente, il rischio più basso per ciascun livello di rendimento atteso. I portafogli collocati al di sotto della frontiera efficiente sono inefficienti, poiché esiste un altro portafoglio ammissibile che offre un rendimento atteso maggiore a parità di rischio oppure un rischio inferiore a parità di rendimento atteso. La frontiera efficiente costituisce quindi una rappresentazione visiva e analitica delle migliori combinazioni rischio-rendimento ottenibili dato un insieme di attività.
 
 La teoria di portafoglio di Markowitz, sviluppata da Harry Markowitz, formalizza la selezione di portafoglio attraverso il paradigma media-varianza. Essa sottolinea che gli investitori non dovrebbero selezionare le attività esclusivamente sulla base dei rendimenti attesi o dei rischi individuali. Al contrario, dovrebbero valutare il modo in cui le attività interagiscono all'interno del portafoglio tramite la covarianza. Combinando rendimenti attesi, varianze, covarianze e vincoli sui pesi di portafoglio, il modello di Markowitz individua portafogli efficienti e fornisce una base rigorosa per la moderna costruzione di portafoglio.
+
+Sulla base di questi richiami teorici, l'analisi empirica applica il modello di Markowitz a sei azioni statunitensi appartenenti a settori differenti. I rendimenti storici saranno utilizzati per stimare i rendimenti attesi e la matrice di covarianza; tali stime costituiranno quindi l'input per la costruzione della frontiera efficiente, del portafoglio a minima varianza e del portafoglio con massimo Sharpe Ratio.
 
 # 3. Raccolta dati
 
@@ -154,8 +156,8 @@ La costruzione della frontiera efficiente è stata realizzata individuando, tra 
 
 Il portafoglio a minima varianza rappresenta l'allocazione che, tra quelle ammissibili, consente di ottenere la minore volatilità complessiva. I risultati stimati per tale portafoglio sono i seguenti:
 
-- Expected Return = 11.83%
-- Volatility = 12.75%
+- Rendimento atteso = 11.83%
+- Volatilità = 12.75%
 - Sharpe Ratio = 0.928
 
 La composizione del portafoglio a minima varianza è riportata di seguito:
@@ -175,8 +177,8 @@ L'elevato peso attribuito a KO e JNJ non deve essere interpretato soltanto come 
 
 Il portafoglio con massimo Sharpe Ratio è l'allocazione che massimizza il rendimento atteso per unità di rischio, assumendo un tasso privo di rischio pari a zero. Esso non coincide necessariamente con il portafoglio meno rischioso, poiché l'obiettivo consiste nel migliorare il rapporto tra rendimento e volatilità. I risultati ottenuti sono i seguenti:
 
-- Expected Return = 15.28%
-- Volatility = 14.00%
+- Rendimento atteso = 15.28%
+- Volatilità = 14.00%
 - Sharpe Ratio = 1.092
 
 La composizione del portafoglio con massimo Sharpe Ratio è la seguente:
@@ -210,7 +212,7 @@ I principali risultati empirici evidenziano una significativa eterogeneità tra 
 
 La diversificazione emerge come elemento centrale dell'intera analisi. La riduzione del rischio non dipende soltanto dall'inclusione di titoli meno volatili, ma anche dalla possibilità di combinare attività i cui rendimenti non si muovono in modo perfettamente sincronizzato. L'investimento in singole azioni espone l'investitore a un rischio specifico più elevato, legato alle condizioni operative, settoriali e finanziarie della singola impresa. Al contrario, un portafoglio diversificato consente di attenuare tali componenti idiosincratiche, distribuendo l'esposizione su più fonti di rendimento e riducendo la dipendenza dalla performance di un solo titolo.
 
-Il framework di Markowitz si dimostra utile perché fornisce una procedura rigorosa per trasformare le informazioni storiche su rendimenti, varianze e covarianze in decisioni di allocazione coerenti. Esso permette di identificare portafogli efficienti e di distinguere le combinazioni dominate da quelle che offrono il miglior compromesso tra rendimento atteso e volatilità. In particolare, il portafoglio a minima varianza deve essere interpretato come l'allocazione più prudente tra quelle ammissibili, poiché minimizza la volatilità complessiva attribuendo pesi maggiori ai titoli più stabili e difensivi, soprattutto Coca-Cola e Johnson & Johnson. Il portafoglio con massimo Sharpe Ratio, invece, rappresenta l'allocazione più efficiente in termini di rendimento atteso per unità di rischio totale: esso accetta una volatilità superiore rispetto al portafoglio a minima varianza, ma ottiene una migliore compensazione del rischio attraverso una maggiore esposizione a titoli con rendimento storico più elevato, in particolare Exxon Mobil, Apple e JPMorgan Chase.
+Il modello di Markowitz si dimostra utile perché fornisce una procedura rigorosa per trasformare le informazioni storiche su rendimenti, varianze e covarianze in decisioni di allocazione coerenti. Esso permette di identificare portafogli efficienti e di distinguere le combinazioni dominate da quelle che offrono il miglior compromesso tra rendimento atteso e volatilità. In particolare, il portafoglio a minima varianza deve essere interpretato come l'allocazione più prudente tra quelle ammissibili, poiché minimizza la volatilità complessiva attribuendo pesi maggiori ai titoli più stabili e difensivi, soprattutto Coca-Cola e Johnson & Johnson. Il portafoglio con massimo Sharpe Ratio, invece, rappresenta l'allocazione più efficiente in termini di rendimento atteso per unità di rischio totale: esso accetta una volatilità superiore rispetto al portafoglio a minima varianza, ma ottiene una migliore compensazione del rischio attraverso una maggiore esposizione a titoli con rendimento storico più elevato, in particolare Exxon Mobil, Apple e JPMorgan Chase.
 
 Nel complesso, il confronto tra investimento in singole azioni e investimento in un portafoglio diversificato conferma il valore della costruzione di portafoglio. Sebbene alcuni titoli individuali possano presentare rendimenti medi più elevati, essi comportano anche rischi specifici che possono risultare rilevanti. L'approccio di portafoglio consente invece di valutare ogni titolo non isolatamente, ma in funzione del contributo che esso apporta al rendimento atteso e alla volatilità complessiva. La frontiera efficiente sintetizza questa logica, mostrando che l'ottimizzazione dei pesi può produrre combinazioni più equilibrate rispetto a scelte concentrate o casuali.
 

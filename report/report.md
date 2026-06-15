@@ -164,6 +164,8 @@ La costruzione della frontiera efficiente è stata realizzata individuando, tra 
 
 # 7. Risultati
 
+Il portafoglio a minima varianza e il portafoglio con massimo Sharpe Ratio sono identificati tra i 10.000 portafogli casuali simulati in `src/04_markowitz_simulation.py`, tramite la funzione `find_extreme_portfolios`, mentre la frontiera efficiente è costruita mediante ottimizzazione vincolata nella funzione `build_efficient_frontier`.
+
 ## 7.1 Portafoglio a minima varianza
 
 Il portafoglio a minima varianza rappresenta l'allocazione che, tra quelle ammissibili, consente di ottenere la minore volatilità complessiva. I risultati stimati per tale portafoglio sono i seguenti:

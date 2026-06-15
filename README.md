@@ -41,3 +41,21 @@ markowitz-portfolio-project/
 ├── requirements.txt
 └── .gitignore
 ```
+
+## Reproducible Outputs
+
+Generated datasets, tables, portfolio outputs, and figures are intentionally not committed.
+They can be reproduced from the project root by running the scripts in order:
+
+```bash
+python src/01_download_data.py
+python src/02_descriptive_analysis.py
+python src/03_correlations.py
+python src/04_markowitz_simulation.py
+```
+
+The first script downloads adjusted close prices from Yahoo Finance and writes
+`data/raw/adjusted_close_prices.csv` and `data/processed/log_returns.csv`.
+The following scripts consume those files and regenerate the descriptive tables,
+correlation outputs, portfolio CSV files, and figures under `outputs/` and
+`figures/`.

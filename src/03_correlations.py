@@ -62,10 +62,9 @@ def format_significance_marker(p_value: float) -> str:
 
 def plot_correlation_heatmap(
     correlation_matrix: pd.DataFrame,
-    significance_matrix: pd.DataFrame,
     output_path: Path,
 ) -> None:
-    """Create a matplotlib heatmap with correlation values and significance markers."""
+    """Create a matplotlib heatmap with Pearson correlation values."""
     fig, ax = plt.subplots(figsize=(8, 6))
     image = ax.imshow(correlation_matrix, cmap="coolwarm", vmin=-1, vmax=1)
 
@@ -78,11 +77,10 @@ def plot_correlation_heatmap(
     for row_index, row_name in enumerate(correlation_matrix.index):
         for column_index, column_name in enumerate(correlation_matrix.columns):
             value = correlation_matrix.loc[row_name, column_name]
-            marker = significance_matrix.loc[row_name, column_name]
             ax.text(
                 column_index,
                 row_index,
-                f"{value:.2f}{marker}",
+                f"{value:.2f}",
                 ha="center",
                 va="center",
                 color="black",
@@ -109,7 +107,7 @@ def main() -> None:
     correlation_matrix.to_csv(CORRELATION_MATRIX_PATH)
     pvalue_matrix.to_csv(CORRELATION_PVALUES_PATH)
     significance_matrix.to_csv(CORRELATION_SIGNIFICANCE_PATH)
-    plot_correlation_heatmap(correlation_matrix, significance_matrix, CORRELATION_HEATMAP_PATH)
+    plot_correlation_heatmap(correlation_matrix, CORRELATION_HEATMAP_PATH)
 
     print("Correlation matrix:")
     print(correlation_matrix)

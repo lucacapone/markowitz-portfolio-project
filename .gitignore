@@ -44,3 +44,4 @@ figures/correlation_heatmap.png
 
 # Locally generated Markowitz figure
 figures/efficient_frontier.png
+figures/correlation_pvalues_heatmap.png

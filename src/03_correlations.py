@@ -13,6 +13,8 @@ TABLES_DIR = Path("outputs/tables")
 
 LOG_RETURNS_PATH = PROCESSED_DATA_DIR / "log_returns.csv"
 CORRELATION_MATRIX_PATH = TABLES_DIR / "correlation_matrix.csv"
+CORRELATION_PVALUES_PATH = TABLES_DIR / "correlation_pvalues.csv"
+CORRELATION_SIGNIFICANCE_PATH = TABLES_DIR / "correlation_significance.csv"
 CORRELATION_HEATMAP_PATH = FIGURES_DIR / "correlation_heatmap.png"
 
 
@@ -26,7 +28,7 @@ def compute_correlation_matrix(log_returns: pd.DataFrame) -> pd.DataFrame:
     return log_returns.corr(method="pearson")
 
 
-def compute_significance_matrix(log_returns: pd.DataFrame) -> pd.DataFrame:
+def compute_pvalue_matrix(log_returns: pd.DataFrame) -> pd.DataFrame:
     """Compute Pearson correlation p-values for each pair of return series."""
     p_values = pd.DataFrame(
         index=log_returns.columns,
@@ -40,6 +42,11 @@ def compute_significance_matrix(log_returns: pd.DataFrame) -> pd.DataFrame:
             p_values.loc[row_name, column_name] = p_value
 
     return p_values
+
+
+def compute_significance_matrix(pvalue_matrix: pd.DataFrame) -> pd.DataFrame:
+    """Convert p-values to conventional string significance markers."""
+    return pvalue_matrix.map(format_significance_marker)
 
 
 def format_significance_marker(p_value: float) -> str:
@@ -71,9 +78,7 @@ def plot_correlation_heatmap(
     for row_index, row_name in enumerate(correlation_matrix.index):
         for column_index, column_name in enumerate(correlation_matrix.columns):
             value = correlation_matrix.loc[row_name, column_name]
-            marker = format_significance_marker(
-                significance_matrix.loc[row_name, column_name]
-            )
+            marker = significance_matrix.loc[row_name, column_name]
             ax.text(
                 column_index,
                 row_index,
@@ -98,15 +103,20 @@ def main() -> None:
 
     log_returns = read_log_returns(LOG_RETURNS_PATH)
     correlation_matrix = compute_correlation_matrix(log_returns)
-    significance_matrix = compute_significance_matrix(log_returns)
+    pvalue_matrix = compute_pvalue_matrix(log_returns)
+    significance_matrix = compute_significance_matrix(pvalue_matrix)
 
     correlation_matrix.to_csv(CORRELATION_MATRIX_PATH)
+    pvalue_matrix.to_csv(CORRELATION_PVALUES_PATH)
+    significance_matrix.to_csv(CORRELATION_SIGNIFICANCE_PATH)
     plot_correlation_heatmap(correlation_matrix, significance_matrix, CORRELATION_HEATMAP_PATH)
 
     print("Correlation matrix:")
     print(correlation_matrix)
     print("\nSaved CSV:")
     print(CORRELATION_MATRIX_PATH)
+    print(CORRELATION_PVALUES_PATH)
+    print(CORRELATION_SIGNIFICANCE_PATH)
     print("\nSaved figure:")
     print(CORRELATION_HEATMAP_PATH)
 

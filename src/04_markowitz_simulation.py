@@ -20,16 +20,28 @@ PORTFOLIOS_DIR = Path("outputs/portfolios")
 FIGURES_DIR = Path("figures")
 
 LOG_RETURNS_PATH = PROCESSED_DATA_DIR / "log_returns.csv"
+TEST_LOG_RETURNS_PATH = PROCESSED_DATA_DIR / "log_returns_test.csv"
 PORTFOLIO_SIMULATION_PATH = PORTFOLIOS_DIR / "portfolio_simulation.csv"
 MINIMUM_VARIANCE_PATH = PORTFOLIOS_DIR / "minimum_variance_portfolio.csv"
 MAXIMUM_SHARPE_PATH = PORTFOLIOS_DIR / "maximum_sharpe_portfolio.csv"
 EFFICIENT_FRONTIER_PATH = PORTFOLIOS_DIR / "efficient_frontier.csv"
+OUT_OF_SAMPLE_EVALUATION_PATH = PORTFOLIOS_DIR / "out_of_sample_evaluation.csv"
 EFFICIENT_FRONTIER_FIGURE_PATH = FIGURES_DIR / "efficient_frontier.png"
 
 
 def read_log_returns(path: Path) -> pd.DataFrame:
     """Read daily log returns with dates in the first column."""
     return pd.read_csv(path, index_col=0, parse_dates=True)
+
+
+def validate_and_reindex_log_returns(
+    log_returns: pd.DataFrame, tickers: list[str] = TICKERS
+) -> pd.DataFrame:
+    """Validate that expected tickers are present and order columns consistently."""
+    missing_tickers = set(tickers) - set(log_returns.columns)
+    if missing_tickers:
+        raise ValueError(f"Missing expected tickers: {sorted(missing_tickers)}")
+    return log_returns.reindex(columns=tickers)
 
 
 def annualize_returns(log_returns: pd.DataFrame) -> tuple[pd.Series, pd.DataFrame]:
@@ -148,6 +160,51 @@ def build_efficient_frontier(
     return pd.DataFrame(frontier_records)
 
 
+def evaluate_out_of_sample(
+    portfolios: dict[str, pd.DataFrame],
+    train_log_returns: pd.DataFrame,
+    test_log_returns: pd.DataFrame,
+) -> pd.DataFrame:
+    """Evaluate optimal portfolios on the held-out test month.
+
+    The test month is excluded from estimation and used only for ex-post
+    evaluation of the portfolios selected with training data.
+    """
+    records = []
+    weight_columns = [f"{ticker} weight" for ticker in train_log_returns.columns]
+    number_of_test_trading_days = len(test_log_returns)
+
+    for portfolio_name, portfolio in portfolios.items():
+        weights = portfolio.loc[:, weight_columns].iloc[0].to_numpy(dtype=float)
+        portfolio_mean_daily_log_return_train = float(
+            np.dot(weights, train_log_returns.mean())
+        )
+        expected_monthly_log_return = (
+            portfolio_mean_daily_log_return_train * number_of_test_trading_days
+        )
+        expected_monthly_simple_return = float(
+            np.exp(expected_monthly_log_return) - 1
+        )
+        daily_test_portfolio_log_returns = test_log_returns.to_numpy() @ weights
+        realized_monthly_log_return = float(daily_test_portfolio_log_returns.sum())
+        realized_monthly_simple_return = float(np.exp(realized_monthly_log_return) - 1)
+        forecast_error = realized_monthly_simple_return - expected_monthly_simple_return
+
+        records.append(
+            {
+                "Portfolio": portfolio_name,
+                "Expected Monthly Log Return": expected_monthly_log_return,
+                "Expected Monthly Simple Return": expected_monthly_simple_return,
+                "Realized Monthly Log Return": realized_monthly_log_return,
+                "Realized Monthly Simple Return": realized_monthly_simple_return,
+                "Forecast Error": forecast_error,
+                "Number of Test Days": number_of_test_trading_days,
+            }
+        )
+
+    return pd.DataFrame(records)
+
+
 def plot_efficient_frontier(
     portfolios: pd.DataFrame,
     efficient_frontier: pd.DataFrame,
@@ -222,21 +279,34 @@ def main() -> None:
     PORTFOLIOS_DIR.mkdir(parents=True, exist_ok=True)
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
-    log_returns = read_log_returns(LOG_RETURNS_PATH)
-    missing_tickers = set(TICKERS) - set(log_returns.columns)
-    if missing_tickers:
-        raise ValueError(f"Missing expected tickers: {sorted(missing_tickers)}")
-    log_returns = log_returns.reindex(columns=TICKERS)
-    annual_returns, annual_covariance_matrix = annualize_returns(log_returns)
+    train_log_returns = validate_and_reindex_log_returns(
+        read_log_returns(LOG_RETURNS_PATH)
+    )
+    # The test month is held out from estimation and used only for ex-post
+    # out-of-sample evaluation after portfolio weights are selected.
+    test_log_returns = validate_and_reindex_log_returns(
+        read_log_returns(TEST_LOG_RETURNS_PATH)
+    )
+
+    annual_returns, annual_covariance_matrix = annualize_returns(train_log_returns)
 
     portfolios = simulate_random_portfolios(annual_returns, annual_covariance_matrix)
     minimum_variance, maximum_sharpe = find_extreme_portfolios(portfolios)
     efficient_frontier = build_efficient_frontier(annual_returns, annual_covariance_matrix)
+    out_of_sample_evaluation = evaluate_out_of_sample(
+        {
+            "Minimum Variance Portfolio": minimum_variance,
+            "Maximum Sharpe Portfolio": maximum_sharpe,
+        },
+        train_log_returns,
+        test_log_returns,
+    )
 
     portfolios.to_csv(PORTFOLIO_SIMULATION_PATH, index=False)
     minimum_variance.to_csv(MINIMUM_VARIANCE_PATH, index=False)
     maximum_sharpe.to_csv(MAXIMUM_SHARPE_PATH, index=False)
     efficient_frontier.to_csv(EFFICIENT_FRONTIER_PATH, index=False)
+    out_of_sample_evaluation.to_csv(OUT_OF_SAMPLE_EVALUATION_PATH, index=False)
     plot_efficient_frontier(
         portfolios,
         efficient_frontier,
@@ -249,12 +319,15 @@ def main() -> None:
     print(minimum_variance.to_string(index=False))
     print("\nMaximum Sharpe portfolio summary:")
     print(maximum_sharpe.to_string(index=False))
+    print("\nOut-of-sample evaluation:")
+    print(out_of_sample_evaluation.to_string(index=False))
     print("\nFiles created:")
     for path in (
         PORTFOLIO_SIMULATION_PATH,
         MINIMUM_VARIANCE_PATH,
         MAXIMUM_SHARPE_PATH,
         EFFICIENT_FRONTIER_PATH,
+        OUT_OF_SAMPLE_EVALUATION_PATH,
         EFFICIENT_FRONTIER_FIGURE_PATH,
     ):
         print(path)

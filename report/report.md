@@ -245,6 +245,28 @@ L'interpretazione della frontiera efficiente si fonda sul principio di dominanza
 
 I benefici della diversificazione emergono dal fatto che la volatilità del portafoglio non è una semplice media ponderata delle volatilità individuali, ma dipende anche dalle covarianze tra i rendimenti. La presenza di correlazioni contenute tra i titoli selezionati permette di costruire portafogli con rischio inferiore rispetto a quello che si otterrebbe concentrando l'investimento in singole attività. In particolare, l'inclusione di titoli difensivi come KO e JNJ contribuisce a ridurre la variabilità complessiva, mentre titoli come XOM, AAPL e JPM possono accrescere il rendimento atteso quando inseriti con pesi coerenti con i vincoli di rischio.
 
+Dal punto di vista operativo, la frontiera efficiente è stata costruita nello script `src/04_markowitz_simulation.py` mediante ottimizzazione vincolata con metodo SLSQP. Lo script utilizza come input i rendimenti logaritmici contenuti in `data/processed/log_returns.csv`, annualizza i rendimenti medi e la matrice di covarianza e genera inizialmente 10.000 portafogli casuali long-only. Per ciascun portafoglio simulato vengono calcolati rendimento atteso annualizzato, volatilità annualizzata e Sharpe Ratio.
+
+La simulazione casuale serve a esplorare lo spazio dei portafogli ammissibili e a visualizzare molte combinazioni possibili di rischio e rendimento. Tuttavia, trattandosi di un campionamento casuale, non garantisce necessariamente di individuare l’ottimo matematico esatto. Per questo motivo, la frontiera efficiente viene costruita separatamente tramite ottimizzazione vincolata. In particolare, per ciascun livello di rendimento atteso target, l’algoritmo SLSQP minimizza la volatilità del portafoglio rispettando i vincoli di pieno investimento e di portafoglio long-only, cioè somma dei pesi pari a uno e pesi compresi tra 0 e 1.
+
+Formalmente, per ogni rendimento target viene risolto il seguente problema:
+
+[
+\min_w \quad w^T \Sigma w
+]
+
+soggetto a:
+
+[
+w^T \mu = \mu_{target}
+]
+
+[
+\sum_i w_i = 1, \qquad 0 \leq w_i \leq 1
+]
+
+L’insieme dei portafogli ottenuti per i diversi livelli di rendimento target costituisce la frontiera efficiente. Di conseguenza, mentre i 10.000 portafogli simulati rappresentano una descrizione approssimata dello spazio delle allocazioni possibili, la frontiera efficiente deriva da un procedimento di ottimizzazione numerica più strutturato.
+
 La figura `figures/efficient_frontier.png` rappresenta la frontiera efficiente generata dall'analisi. Essa consente di confrontare visivamente i 10.000 portafogli simulati con le allocazioni efficienti. Il grafico aggiornato include inoltre una linea orizzontale che parte dal portafoglio a minima varianza: tale riferimento visivo separa la regione superiore, nella quale si collocano le combinazioni efficienti con rendimento atteso almeno pari a quello del portafoglio a minima varianza, dalla regione inferiore, associata a portafogli inefficienti perché dominati in termini di rendimento atteso a parità o quasi parità di rischio. I portafogli casuali occupano un'area più ampia del piano rischio-rendimento e includono molte combinazioni subottimali; la frontiera efficiente, invece, individua il bordo superiore di tale insieme, ossia le combinazioni che offrono le migliori opportunità disponibili. Il confronto tra portafogli simulati e portafogli efficienti mostra quindi come l'ottimizzazione di Markowitz consenta di selezionare allocazioni superiori rispetto a scelte casuali dei pesi, mantenendo i vincoli di assenza di vendite allo scoperto e di pesi compresi tra 0 e 1.
 
 ![Frontiera efficiente](../figures/efficient_frontier.png)

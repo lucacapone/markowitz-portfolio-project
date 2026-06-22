@@ -21,10 +21,10 @@ LOG_RETURNS_TEST_PATH = PROCESSED_DATA_DIR / "log_returns_test.csv"
 
 
 def download_adjusted_close_prices(tickers: list[str]) -> pd.DataFrame:
-    """Download daily adjusted close prices with buffer beyond five years."""
+    """Download daily adjusted close prices for approximately the last five years."""
     data = yf.download(
         tickers=tickers,
-        period="6y",
+        period="5y",
         interval="1d",
         auto_adjust=False,
         progress=False,

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from scipy import stats
 
 
 PROCESSED_DATA_DIR = Path("data/processed")
@@ -25,8 +26,39 @@ def compute_correlation_matrix(log_returns: pd.DataFrame) -> pd.DataFrame:
     return log_returns.corr(method="pearson")
 
 
-def plot_correlation_heatmap(correlation_matrix: pd.DataFrame, output_path: Path) -> None:
-    """Create a matplotlib heatmap with correlation values in each cell."""
+def compute_significance_matrix(log_returns: pd.DataFrame) -> pd.DataFrame:
+    """Compute Pearson correlation p-values for each pair of return series."""
+    p_values = pd.DataFrame(
+        index=log_returns.columns,
+        columns=log_returns.columns,
+        dtype=float,
+    )
+
+    for row_name in log_returns.columns:
+        for column_name in log_returns.columns:
+            _, p_value = stats.pearsonr(log_returns[row_name], log_returns[column_name])
+            p_values.loc[row_name, column_name] = p_value
+
+    return p_values
+
+
+def format_significance_marker(p_value: float) -> str:
+    """Return a conventional significance marker for a p-value."""
+    if p_value < 0.01:
+        return "***"
+    if p_value < 0.05:
+        return "**"
+    if p_value < 0.1:
+        return "*"
+    return ""
+
+
+def plot_correlation_heatmap(
+    correlation_matrix: pd.DataFrame,
+    significance_matrix: pd.DataFrame,
+    output_path: Path,
+) -> None:
+    """Create a matplotlib heatmap with correlation values and significance markers."""
     fig, ax = plt.subplots(figsize=(8, 6))
     image = ax.imshow(correlation_matrix, cmap="coolwarm", vmin=-1, vmax=1)
 
@@ -39,10 +71,13 @@ def plot_correlation_heatmap(correlation_matrix: pd.DataFrame, output_path: Path
     for row_index, row_name in enumerate(correlation_matrix.index):
         for column_index, column_name in enumerate(correlation_matrix.columns):
             value = correlation_matrix.loc[row_name, column_name]
+            marker = format_significance_marker(
+                significance_matrix.loc[row_name, column_name]
+            )
             ax.text(
                 column_index,
                 row_index,
-                f"{value:.2f}",
+                f"{value:.2f}{marker}",
                 ha="center",
                 va="center",
                 color="black",
@@ -63,9 +98,10 @@ def main() -> None:
 
     log_returns = read_log_returns(LOG_RETURNS_PATH)
     correlation_matrix = compute_correlation_matrix(log_returns)
+    significance_matrix = compute_significance_matrix(log_returns)
 
     correlation_matrix.to_csv(CORRELATION_MATRIX_PATH)
-    plot_correlation_heatmap(correlation_matrix, CORRELATION_HEATMAP_PATH)
+    plot_correlation_heatmap(correlation_matrix, significance_matrix, CORRELATION_HEATMAP_PATH)
 
     print("Correlation matrix:")
     print(correlation_matrix)

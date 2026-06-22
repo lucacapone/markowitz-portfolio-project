@@ -74,13 +74,16 @@ def compute_log_returns(prices: pd.DataFrame) -> pd.DataFrame:
     return np.log(prices / prices.shift(1)).dropna(how="any")
 
 
-def print_sample_summary(label: str, sample: pd.DataFrame) -> None:
-    """Print the date range and observation count for a price sample."""
+def print_sample_summary(
+    label: str, prices: pd.DataFrame, returns: pd.DataFrame
+) -> None:
+    """Print date range and observation counts for a sample."""
     print(
         f"{label} sample date range: "
-        f"{sample.index.min().date()} to {sample.index.max().date()}"
+        f"{prices.index.min().date()} to {prices.index.max().date()}"
     )
-    print(f"{label} sample observation count: {len(sample)}")
+    print(f"{label} sample price observation count: {len(prices)}")
+    print(f"{label} sample return observation count: {len(returns)}")
 
 
 def main() -> None:
@@ -105,9 +108,9 @@ def main() -> None:
     train_prices.to_csv(ADJUSTED_CLOSE_PATH)
     log_returns_train.to_csv(LOG_RETURNS_PATH)
 
-    print_sample_summary("Full", prices)
-    print_sample_summary("Training", train_prices)
-    print_sample_summary("Test", test_prices)
+    print_sample_summary("Full", prices, log_returns_full)
+    print_sample_summary("Training", train_prices, log_returns_train)
+    print_sample_summary("Test", test_prices, log_returns_test)
     print("\nFirst rows of adjusted close prices:")
     print(train_prices.head())
     print("\nFirst rows of log returns:")

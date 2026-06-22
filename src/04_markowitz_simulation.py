@@ -180,6 +180,21 @@ def plot_efficient_frontier(
         s=250,
         label="Minimum Variance Portfolio",
     )
+    min_var_return = float(minimum_variance["Return"].iloc[0])
+    min_var_volatility = float(minimum_variance["Volatility"].iloc[0])
+    right_volatility = max(
+        portfolios["Volatility"].max(),
+        efficient_frontier["Volatility"].max(),
+    )
+    ax.hlines(
+        y=min_var_return,
+        xmin=min_var_volatility,
+        xmax=right_volatility,
+        colors="blue",
+        linestyles="--",
+        linewidth=1.5,
+        label="Rendimento del portafoglio a minima varianza",
+    )
     ax.scatter(
         maximum_sharpe["Volatility"],
         maximum_sharpe["Return"],

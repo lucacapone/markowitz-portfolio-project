@@ -16,6 +16,7 @@ CORRELATION_MATRIX_PATH = TABLES_DIR / "correlation_matrix.csv"
 CORRELATION_PVALUES_PATH = TABLES_DIR / "correlation_pvalues.csv"
 CORRELATION_SIGNIFICANCE_PATH = TABLES_DIR / "correlation_significance.csv"
 CORRELATION_HEATMAP_PATH = FIGURES_DIR / "correlation_heatmap.png"
+CORRELATION_PVALUES_HEATMAP_PATH = FIGURES_DIR / "correlation_pvalues_heatmap.png"
 
 
 def read_log_returns(path: Path) -> pd.DataFrame:
@@ -94,6 +95,37 @@ def plot_correlation_heatmap(
     plt.close(fig)
 
 
+def plot_pvalue_heatmap(pvalue_matrix: pd.DataFrame, output_path: Path) -> None:
+    """Create a matplotlib heatmap with Pearson correlation p-values."""
+    fig, ax = plt.subplots(figsize=(8, 6))
+    image = ax.imshow(pvalue_matrix, cmap="viridis_r", vmin=0, vmax=1)
+
+    ax.set_title("Pearson Correlation P-value Matrix of Daily Log Returns")
+    ax.set_xticks(range(len(pvalue_matrix.columns)))
+    ax.set_xticklabels(pvalue_matrix.columns, rotation=45, ha="right")
+    ax.set_yticks(range(len(pvalue_matrix.index)))
+    ax.set_yticklabels(pvalue_matrix.index)
+
+    for row_index, row_name in enumerate(pvalue_matrix.index):
+        for column_index, column_name in enumerate(pvalue_matrix.columns):
+            value = pvalue_matrix.loc[row_name, column_name]
+            ax.text(
+                column_index,
+                row_index,
+                f"{value:.3f}",
+                ha="center",
+                va="center",
+                color="black",
+            )
+
+    colorbar = fig.colorbar(image, ax=ax)
+    colorbar.set_label("Pearson correlation p-value")
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+
 def main() -> None:
     """Compute correlations for log returns and save the table and heatmap."""
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
@@ -108,6 +140,7 @@ def main() -> None:
     pvalue_matrix.to_csv(CORRELATION_PVALUES_PATH)
     significance_matrix.to_csv(CORRELATION_SIGNIFICANCE_PATH)
     plot_correlation_heatmap(correlation_matrix, CORRELATION_HEATMAP_PATH)
+    plot_pvalue_heatmap(pvalue_matrix, CORRELATION_PVALUES_HEATMAP_PATH)
 
     print("Correlation matrix:")
     print(correlation_matrix)
@@ -121,6 +154,7 @@ def main() -> None:
     print(CORRELATION_SIGNIFICANCE_PATH)
     print("\nSaved figure:")
     print(CORRELATION_HEATMAP_PATH)
+    print(CORRELATION_PVALUES_HEATMAP_PATH)
 
 
 if __name__ == "__main__":

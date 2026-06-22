@@ -38,3 +38,6 @@ Thumbs.db
 *.tmp
 *.temp
 *.log
+
+# Locally generated correlation heatmap
+figures/correlation_heatmap.png

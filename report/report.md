@@ -50,7 +50,7 @@ Sulla base di questi richiami teorici, l'analisi empirica applica il modello di 
 
 # 3. Raccolta dati
 
-La base informativa utilizzata per l'analisi è costituita da dati storici di mercato provenienti da Yahoo Finance, una fonte ampiamente impiegata nelle applicazioni empiriche di finanza per l'accesso a serie temporali di prezzi azionari. I dati sono stati raccolti con frequenza giornaliera, in modo da osservare con sufficiente dettaglio la dinamica dei prezzi e dei rendimenti nel tempo. L'orizzonte temporale considerato copre un periodo di osservazione di cinque anni, scelta che consente di includere diverse condizioni di mercato e di ottenere un numero adeguato di osservazioni per le successive elaborazioni statistiche.
+La base informativa utilizzata per l'analisi è costituita da dati storici di mercato provenienti da Yahoo Finance, una fonte ampiamente impiegata nelle applicazioni empiriche di finanza per l'accesso a serie temporali di prezzi azionari. I dati sono stati raccolti con frequenza giornaliera, in modo da osservare con sufficiente dettaglio la dinamica dei prezzi e dei rendimenti nel tempo. L'orizzonte temporale complessivo considerato copre approssimativamente gli ultimi cinque anni, dal 22 giugno 2021 al 22 giugno 2026. Al fine di rendere più rigorosa la valutazione empirica, il mese più recente è stato escluso dal campione utilizzato per la stima: il campione di training comprende il periodo dal 22 giugno 2021 al 29 maggio 2026, mentre il campione di test comprende esclusivamente il periodo dal 1 giugno 2026 al 22 giugno 2026. In questo modo, rendimenti attesi, matrice di covarianza, correlazioni e pesi dei portafogli ottimali sono stimati soltanto sui dati disponibili nel campione di training, mentre l'ultimo mese viene impiegato unicamente per una verifica fuori campione della performance realizzata. Tale separazione tra periodo di stima e periodo di valutazione evita l'introduzione di look-ahead bias, poiché le informazioni del mese finale non contribuiscono alla costruzione dei portafogli.
 
 Il campione è composto da sei titoli azionari quotati sul mercato statunitense: Apple (AAPL), JPMorgan Chase (JPM), Coca-Cola (KO), Johnson & Johnson (JNJ), Exxon Mobil (XOM) e Boeing (BA). La selezione di tali società risponde all'esigenza di costruire un insieme di attività rappresentativo di settori economici differenti. Apple appartiene al comparto tecnologico, JPMorgan Chase al settore finanziario, Coca-Cola ai beni di consumo difensivi, Johnson & Johnson al settore sanitario, Exxon Mobil all'energia e Boeing all'industria aerospaziale e manifatturiera. Tale eterogeneità settoriale è rilevante perché riduce la concentrazione dell'analisi su un'unica area dell'economia e permette di valutare in modo più appropriato i potenziali benefici della diversificazione.
 
@@ -134,6 +134,24 @@ Nel complesso, la struttura delle correlazioni suggerisce che i titoli seleziona
 
 *Figura 3. Heatmap della matrice di correlazione dei rendimenti, che evidenzia la prevalenza di relazioni positive ma moderate tra le attività considerate.*
 
+
+## 5.2 Significatività statistica delle correlazioni
+
+Per integrare l'analisi descrittiva della matrice di correlazione, è stata valutata anche la significatività statistica dei coefficienti di Pearson. Per ciascuna coppia di titoli il test considera come ipotesi nulla \(H_0: \rho = 0\), ossia assenza di correlazione lineare nella popolazione. Il p-value associato misura la probabilità di osservare un coefficiente campionario almeno altrettanto estremo di quello stimato, qualora l'ipotesi nulla fosse vera. Valori piccoli del p-value portano quindi a rifiutare \(H_0\) e indicano che la correlazione osservata è statisticamente significativa.
+
+La matrice dei p-value formattati è la seguente:
+
+|      | AAPL | JPM | KO | JNJ | XOM | BA |
+|------|------|------|------|------|------|------|
+| AAPL | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 |
+| JPM  | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 |
+| KO   | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 |
+| JNJ  | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | 0.012 |
+| XOM  | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 |
+| BA   | <0.001 | <0.001 | <0.001 | 0.012 | <0.001 | <0.001 |
+
+I risultati mostrano che quasi tutti i p-value sono inferiori a 0.001, segnalando una forte evidenza statistica contro l'ipotesi di correlazione nulla. L'unica eccezione relativa è la coppia JNJ--BA, per la quale il p-value è pari a 0.012: tale valore è comunque inferiore alla soglia del 5%, quindi la correlazione risulta statisticamente significativa. Tuttavia, il coefficiente stimato è molto basso, pari a circa 0.071, e deve essere interpretato come economicamente debole. Questo punto è importante perché la significatività statistica non implica necessariamente rilevanza economica: con un numero elevato di osservazioni, anche relazioni lineari molto contenute possono risultare statisticamente diverse da zero.
+
 # 6. Applicazione del modello di Markowitz
 
 L'applicazione empirica del modello di Markowitz richiede, in primo luogo, la trasformazione delle serie storiche dei prezzi rettificati in rendimenti giornalieri e la successiva stima dei parametri fondamentali dell'analisi media-varianza. Il rendimento atteso di ciascun titolo è stato stimato come media aritmetica dei rendimenti giornalieri osservati nel campione. Tale grandezza rappresenta una misura sintetica della performance media storica e costituisce il punto di partenza per il calcolo del rendimento atteso di ogni portafoglio ammissibile.
@@ -170,9 +188,9 @@ Il portafoglio a minima varianza e il portafoglio con massimo Sharpe Ratio sono 
 
 Il portafoglio a minima varianza rappresenta l'allocazione che, tra quelle ammissibili, consente di ottenere la minore volatilità complessiva. I risultati stimati per tale portafoglio sono i seguenti:
 
-- Rendimento atteso = 11.83%
-- Volatilità = 12.75%
-- Sharpe Ratio = 0.928
+- Rendimento atteso annualizzato = 11.38%
+- Volatilità annualizzata = 12.73%
+- Sharpe Ratio = 0.894
 
 La composizione del portafoglio a minima varianza è riportata di seguito:
 
@@ -191,9 +209,9 @@ L'elevato peso attribuito a KO e JNJ non deve essere interpretato soltanto come 
 
 Il portafoglio con massimo Sharpe Ratio è l'allocazione che massimizza il rendimento atteso per unità di rischio, assumendo un tasso privo di rischio pari a zero. Esso non coincide necessariamente con il portafoglio meno rischioso, poiché l'obiettivo consiste nel migliorare il rapporto tra rendimento e volatilità. I risultati ottenuti sono i seguenti:
 
-- Rendimento atteso = 15.28%
-- Volatilità = 14.00%
-- Sharpe Ratio = 1.092
+- Rendimento atteso annualizzato = 14.97%
+- Volatilità annualizzata = 14.00%
+- Sharpe Ratio = 1.069
 
 La composizione del portafoglio con massimo Sharpe Ratio è la seguente:
 
@@ -216,23 +234,36 @@ L'interpretazione della frontiera efficiente si fonda sul principio di dominanza
 
 I benefici della diversificazione emergono dal fatto che la volatilità del portafoglio non è una semplice media ponderata delle volatilità individuali, ma dipende anche dalle covarianze tra i rendimenti. La presenza di correlazioni contenute tra i titoli selezionati permette di costruire portafogli con rischio inferiore rispetto a quello che si otterrebbe concentrando l'investimento in singole attività. In particolare, l'inclusione di titoli difensivi come KO e JNJ contribuisce a ridurre la variabilità complessiva, mentre titoli come XOM, AAPL e JPM possono accrescere il rendimento atteso quando inseriti con pesi coerenti con i vincoli di rischio.
 
-La figura `figures/efficient_frontier.png` rappresenta la frontiera efficiente generata dall'analisi. Essa consente di confrontare visivamente i 10.000 portafogli simulati con le allocazioni efficienti. I portafogli casuali occupano un'area più ampia del piano rischio-rendimento e includono molte combinazioni subottimali; la frontiera efficiente, invece, individua il bordo superiore di tale insieme, ossia le combinazioni che offrono le migliori opportunità disponibili. Il confronto tra portafogli simulati e portafogli efficienti mostra quindi come l'ottimizzazione di Markowitz consenta di selezionare allocazioni superiori rispetto a scelte casuali dei pesi, mantenendo i vincoli di assenza di vendite allo scoperto e di pesi compresi tra 0 e 1.
+La figura `figures/efficient_frontier.png` rappresenta la frontiera efficiente generata dall'analisi. Essa consente di confrontare visivamente i 10.000 portafogli simulati con le allocazioni efficienti. Il grafico aggiornato include inoltre una linea orizzontale che parte dal portafoglio a minima varianza: tale riferimento visivo separa la regione superiore, nella quale si collocano le combinazioni efficienti con rendimento atteso almeno pari a quello del portafoglio a minima varianza, dalla regione inferiore, associata a portafogli inefficienti perché dominati in termini di rendimento atteso a parità o quasi parità di rischio. I portafogli casuali occupano un'area più ampia del piano rischio-rendimento e includono molte combinazioni subottimali; la frontiera efficiente, invece, individua il bordo superiore di tale insieme, ossia le combinazioni che offrono le migliori opportunità disponibili. Il confronto tra portafogli simulati e portafogli efficienti mostra quindi come l'ottimizzazione di Markowitz consenta di selezionare allocazioni superiori rispetto a scelte casuali dei pesi, mantenendo i vincoli di assenza di vendite allo scoperto e di pesi compresi tra 0 e 1.
 
 ![Frontiera efficiente](../figures/efficient_frontier.png)
 
-*Figura 4. Frontiera efficiente dei portafogli simulati, con evidenza delle combinazioni dominanti nel piano rendimento atteso-volatilità.*
+*Figura 4. Frontiera efficiente dei portafogli simulati, con linea orizzontale dal portafoglio a minima varianza e distinzione visiva tra regione efficiente e regione inefficiente.*
+
+
+
+## 7.4 Verifica fuori campione sull'ultimo mese
+
+La separazione tra campione di training e campione di test consente di valutare se i portafogli ottimali, costruiti utilizzando soltanto le informazioni disponibili fino al 29 maggio 2026, mantengano una performance coerente anche nel mese successivo, escluso dalla stima. La verifica fuori campione è condotta sul periodo dal 1 giugno 2026 al 22 giugno 2026, pari a 14 giorni di negoziazione, confrontando il rendimento mensile semplice atteso con il rendimento mensile semplice effettivamente realizzato.
+
+| Portafoglio | Rendimento mensile semplice atteso | Rendimento mensile semplice realizzato | Errore di previsione | Giorni di test |
+|-------------|------------------------------------|----------------------------------------|----------------------|----------------|
+| Minima varianza | 0.6341% | 0.4448% | -0.1892% | 14 |
+| Massimo Sharpe | 0.8350% | -0.2115% | -1.0466% | 14 |
+
+Il portafoglio a minima varianza ha realizzato un rendimento mensile leggermente inferiore a quello atteso, ma relativamente vicino alla previsione formulata sulla base del campione di training. L'errore di previsione, pari a -0.1892%, indica uno scostamento contenuto e conferma una maggiore stabilità dell'allocazione più prudente nel mese escluso dalla stima. Il portafoglio con massimo Sharpe Ratio, invece, ha sottoperformato in misura più marcata rispetto al rendimento mensile atteso e ha prodotto un rendimento realizzato negativo, pari a -0.2115%. Tale risultato evidenzia che l'ottimalità in-sample non garantisce necessariamente una performance favorevole fuori campione: un portafoglio costruito per massimizzare il rapporto rendimento-rischio sui dati storici può risultare più esposto a variazioni di mercato non presenti o non pienamente rappresentate nel periodo di stima.
 
 # 8. Conclusioni
 
 Il progetto ha avuto l'obiettivo di applicare il modello media-varianza di Markowitz a un insieme di sei titoli azionari statunitensi appartenenti a settori differenti, al fine di valutare empiricamente il rapporto tra rendimento atteso e rischio e di individuare allocazioni di portafoglio efficienti. L'analisi ha combinato una fase descrittiva, volta a esaminare le caratteristiche statistiche dei rendimenti, con una fase di ottimizzazione, finalizzata alla costruzione del portafoglio a minima varianza e del portafoglio con massimo Sharpe Ratio. In questo senso, il lavoro ha mostrato come la selezione di portafoglio non possa fondarsi esclusivamente sulla performance storica dei singoli titoli, ma debba considerare congiuntamente volatilità, correlazioni e contributo marginale di ciascuna attività al rischio complessivo.
 
-I principali risultati empirici evidenziano una significativa eterogeneità tra i titoli analizzati. Exxon Mobil, JPMorgan Chase e Apple presentano rendimenti medi storici relativamente più elevati, mentre Coca-Cola e Johnson & Johnson mostrano una volatilità inferiore e un profilo più difensivo. Boeing, al contrario, combina un rendimento medio negativo con una volatilità elevata, risultando meno attraente nell'ambito dell'ottimizzazione media-varianza. La matrice di correlazione indica inoltre relazioni positive ma generalmente moderate tra i rendimenti, confermando l'esistenza di potenziali benefici derivanti dalla diversificazione settoriale.
+I principali risultati empirici evidenziano una significativa eterogeneità tra i titoli analizzati. Exxon Mobil, JPMorgan Chase e Apple presentano rendimenti medi storici relativamente più elevati, mentre Coca-Cola e Johnson & Johnson mostrano una volatilità inferiore e un profilo più difensivo. Boeing, al contrario, combina un rendimento medio negativo con una volatilità elevata, risultando meno attraente nell'ambito dell'ottimizzazione media-varianza. La matrice di correlazione indica inoltre relazioni positive ma generalmente moderate tra i rendimenti, confermando l'esistenza di potenziali benefici derivanti dalla diversificazione settoriale. I p-value delle correlazioni confermano che tali relazioni sono in larga parte statisticamente significative; al tempo stesso, il caso JNJ--BA mostra che una correlazione può essere statisticamente significativa ma economicamente debole.
 
 La diversificazione emerge come elemento centrale dell'intera analisi. La riduzione del rischio non dipende soltanto dall'inclusione di titoli meno volatili, ma anche dalla possibilità di combinare attività i cui rendimenti non si muovono in modo perfettamente sincronizzato. L'investimento in singole azioni espone l'investitore a un rischio specifico più elevato, legato alle condizioni operative, settoriali e finanziarie della singola impresa. Al contrario, un portafoglio diversificato consente di attenuare tali componenti idiosincratiche, distribuendo l'esposizione su più fonti di rendimento e riducendo la dipendenza dalla performance di un solo titolo.
 
 Il modello di Markowitz si dimostra utile perché fornisce una procedura rigorosa per trasformare le informazioni storiche su rendimenti, varianze e covarianze in decisioni di allocazione coerenti. Esso permette di identificare portafogli efficienti e di distinguere le combinazioni dominate da quelle che offrono il miglior compromesso tra rendimento atteso e volatilità. In particolare, il portafoglio a minima varianza deve essere interpretato come l'allocazione più prudente tra quelle ammissibili, poiché minimizza la volatilità complessiva attribuendo pesi maggiori ai titoli più stabili e difensivi, soprattutto Coca-Cola e Johnson & Johnson. Il portafoglio con massimo Sharpe Ratio, invece, rappresenta l'allocazione più efficiente in termini di rendimento atteso per unità di rischio totale: esso accetta una volatilità superiore rispetto al portafoglio a minima varianza, ma ottiene una migliore compensazione del rischio attraverso una maggiore esposizione a titoli con rendimento storico più elevato, in particolare Exxon Mobil, Apple e JPMorgan Chase.
 
-Nel complesso, il confronto tra investimento in singole azioni e investimento in un portafoglio diversificato conferma il valore della costruzione di portafoglio. Sebbene alcuni titoli individuali possano presentare rendimenti medi più elevati, essi comportano anche rischi specifici che possono risultare rilevanti. L'approccio di portafoglio consente invece di valutare ogni titolo non isolatamente, ma in funzione del contributo che esso apporta al rendimento atteso e alla volatilità complessiva. La frontiera efficiente sintetizza questa logica, mostrando che l'ottimizzazione dei pesi può produrre combinazioni più equilibrate rispetto a scelte concentrate o casuali.
+La verifica fuori campione sull'ultimo mese escluso dalla stima fornisce una valutazione più realistica della capacità dei portafogli di tradursi in performance effettive. In tale periodo, il portafoglio a minima varianza ha mostrato una maggiore stabilità rispetto al portafoglio con massimo Sharpe Ratio, che ha registrato una sottoperformance più ampia e un rendimento realizzato negativo. Nel complesso, il confronto tra investimento in singole azioni e investimento in un portafoglio diversificato conferma il valore della costruzione di portafoglio. Sebbene alcuni titoli individuali possano presentare rendimenti medi più elevati, essi comportano anche rischi specifici che possono risultare rilevanti. L'approccio di portafoglio consente invece di valutare ogni titolo non isolatamente, ma in funzione del contributo che esso apporta al rendimento atteso e alla volatilità complessiva. La frontiera efficiente sintetizza questa logica, mostrando che l'ottimizzazione dei pesi può produrre combinazioni più equilibrate rispetto a scelte concentrate o casuali.
 
 ## Limiti del modello
 

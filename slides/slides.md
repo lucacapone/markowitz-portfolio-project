@@ -69,9 +69,10 @@ Yahoo Finance
 Caratteristiche:
 
 * Frequenza giornaliera
-* Orizzonte temporale: ultimi 5 anni
-* Prezzi Adjusted Close
-* Rendimenti logaritmici
+* Campione completo: 22/06/2021--22/06/2026
+* Training: 22/06/2021--29/05/2026
+* Test fuori campione: 01/06/2026--22/06/2026
+* Prezzi Adjusted Close e rendimenti logaritmici
 
 ### Formula utilizzata
 
@@ -123,13 +124,15 @@ Principali evidenze:
   KO – JNJ = 0.451
 
 * Correlazione minima:
-  JNJ – BA = 0.073
+  JNJ – BA ≈ 0.071
 
 ## Interpretazione
 
 Le correlazioni risultano positive ma moderate.
 
 Nessuna coppia di titoli presenta correlazioni prossime all’unità.
+
+I p-value sono quasi tutti < 0.001; JNJ–BA ha p-value = 0.012, quindi è significativa al 5% ma economicamente debole.
 
 ⇒ Benefici significativi di diversificazione.
 
@@ -165,8 +168,8 @@ Nessuna coppia di titoli presenta correlazioni prossime all’unità.
 
 | Portafoglio     | Rendimento | Volatilità | Sharpe Ratio |
 | --------------- | ---------- | ---------- | ------------ |
-| Minima varianza | 11.83%     | 12.75%     | 0.928        |
-| Massimo Sharpe  | 15.28%     | 14.00%     | 1.092        |
+| Minima varianza | 11.38%     | 12.73%     | 0.894        |
+| Massimo Sharpe  | 14.97%     | 14.00%     | 1.069        |
 
 ## Interpretazione
 
@@ -194,7 +197,8 @@ La frontiera efficiente rappresenta l’insieme dei portafogli che:
 
 * chiaro trade-off rischio/rendimento;
 * benefici concreti della diversificazione;
-* presenza di portafogli efficienti superiori alle combinazioni casuali.
+* linea orizzontale dal portafoglio a minima varianza;
+* separazione visiva tra regione efficiente e inefficiente.
 
 ![Frontiera efficiente](../figures/efficient_frontier.png)
 
@@ -202,14 +206,35 @@ La frontiera efficiente rappresenta l’insieme dei portafogli che:
 
 ---
 
-# Slide 10 – Conclusioni
+# Slide 10 – Verifica fuori campione
+
+## Ultimo mese escluso dalla stima
+
+Periodo di test: 01/06/2026--22/06/2026<br>
+Giorni di test: 14
+
+| Portafoglio | Atteso mensile | Realizzato mensile |
+| ----------- | -------------- | ------------------ |
+| Minima varianza | 0.6341% | 0.4448% |
+| Massimo Sharpe | 0.8350% | -0.2115% |
+
+## Interpretazione
+
+* Minima varianza: risultato leggermente inferiore alle attese, ma vicino.
+* Massimo Sharpe: sottoperformance e rendimento realizzato negativo.
+* L'ottimalità in-sample non garantisce performance fuori campione.
+
+---
+
+# Slide 11 – Conclusioni
 
 ## Conclusioni principali
 
 * La diversificazione riduce il rischio complessivo del portafoglio.
 * Il modello di Markowitz consente di individuare portafogli efficienti.
-* I risultati mostrano vantaggi rispetto all’investimento in singoli titoli.
-* Il portafoglio a massimo Sharpe offre il miglior compromesso rischio-rendimento.
+* Le correlazioni sono statisticamente significative, ma non sempre economicamente forti.
+* Il test fuori campione rende la valutazione più realistica.
+* Nell'ultimo mese il portafoglio a minima varianza è stato più stabile del massimo Sharpe.
 
 ## Possibili sviluppi futuri
 

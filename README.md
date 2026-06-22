@@ -15,9 +15,11 @@ Analyze six diversified stocks, compute log returns, descriptive statistics, cor
 
 ## Data
 
-- **Data source:** Yahoo Finance
+- **Data source:** Yahoo Finance adjusted close prices
 - **Frequency:** Daily
 - **Period:** Last 5 years
+- **Estimation sample:** The most recent available calendar month is excluded from the estimation sample. The remaining observations are used as the training sample.
+- **Out-of-sample test period:** The excluded most recent calendar month is used as an out-of-sample test period.
 
 ## Project Structure
 
@@ -54,8 +56,21 @@ python src/03_correlations.py
 python src/04_markowitz_simulation.py
 ```
 
-The first script downloads adjusted close prices from Yahoo Finance and writes
-`data/raw/adjusted_close_prices.csv` and `data/processed/log_returns.csv`.
-The following scripts consume those files and regenerate the descriptive tables,
-correlation outputs, portfolio CSV files, and figures under `outputs/` and
-`figures/`.
+The first script downloads adjusted close prices from Yahoo Finance and writes the following raw and processed datasets:
+
+- `data/raw/adjusted_close_prices_full.csv`
+- `data/raw/adjusted_close_prices_train.csv`
+- `data/raw/adjusted_close_prices_test.csv`
+- `data/processed/log_returns_full.csv`
+- `data/processed/log_returns_train.csv`
+- `data/processed/log_returns_test.csv`
+
+For backward compatibility, the legacy files `data/raw/adjusted_close_prices.csv` and `data/processed/log_returns.csv` now contain the training sample.
+
+The following scripts consume those files and regenerate the descriptive tables, correlation outputs, portfolio CSV files, and figures under `outputs/` and `figures/`. Additional reproducible outputs include:
+
+- `outputs/tables/correlation_pvalues.csv`
+- `outputs/tables/correlation_significance.csv`
+- `outputs/portfolios/out_of_sample_evaluation.csv`
+
+Correlation heatmap labels include significance stars based on Pearson correlation p-values.

@@ -137,13 +137,13 @@ Nel complesso, la struttura delle correlazioni suggerisce che i titoli seleziona
 
 ## 5.2 Significatività statistica delle correlazioni
 
-Per integrare l'analisi descrittiva della matrice di correlazione, è stata valutata anche la significatività statistica dei coefficienti di Pearson. Per ciascuna coppia di titoli il test considera come ipotesi nulla (H_0: \rho = 0), ossia assenza di correlazione lineare nella popolazione. Il p-value associato misura la probabilità di osservare un coefficiente campionario almeno altrettanto estremo di quello stimato, qualora l'ipotesi nulla fosse vera. Valori piccoli del p-value portano quindi a rifiutare (H_0) e indicano che la correlazione osservata è statisticamente significativa.
+Per integrare l'analisi descrittiva della matrice di correlazione, è stata valutata anche la significatività statistica dei coefficienti di Pearson. Per ciascuna coppia di titoli il test considera come ipotesi nulla \(H_0: \rho = 0\), ossia assenza di correlazione lineare nella popolazione. Il p-value associato misura la probabilità di osservare un coefficiente campionario almeno altrettanto estremo di quello stimato, qualora l'ipotesi nulla fosse vera. Valori piccoli del p-value portano quindi a rifiutare (H_0) e indicano che la correlazione osservata è statisticamente significativa.
 
 Dal punto di vista operativo, per ogni coppia di titoli è stata prima calcolata la correlazione campionaria di Pearson, indicata con (r). Tale coefficiente è stato poi trasformato in una statistica (t), secondo la formula:
 
-[
+\[
 t = r \sqrt{\frac{n-2}{1-r^2}}
-]
+\]
 
 dove (n) rappresenta il numero di osservazioni, cioè il numero di rendimenti giornalieri disponibili nel campione di training. La statistica (t) viene confrontata con una distribuzione t di Student con (n-2) gradi di libertà, al fine di ottenere il corrispondente p-value.
 

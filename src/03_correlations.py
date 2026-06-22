@@ -111,6 +111,10 @@ def main() -> None:
 
     print("Correlation matrix:")
     print(correlation_matrix)
+    print("\nP-value matrix:")
+    print(pvalue_matrix)
+    print("\nSignificance matrix:")
+    print(significance_matrix)
     print("\nSaved CSV:")
     print(CORRELATION_MATRIX_PATH)
     print(CORRELATION_PVALUES_PATH)

@@ -33,16 +33,18 @@ def download_adjusted_close_prices(tickers: list[str]) -> pd.DataFrame:
     if data.empty:
         raise RuntimeError("No data was downloaded from Yahoo Finance.")
 
+    # Yahoo usa colonne multi-indice quando scarichiamo più ticker insieme.
     if isinstance(data.columns, pd.MultiIndex):
         adjusted_close = data["Adj Close"]
     else:
         adjusted_close = data[["Adj Close"]]
         adjusted_close.columns = tickers
 
+    # Manteniamo sempre lo stesso ordine dei ticker nei file prodotti.
     adjusted_close = adjusted_close.reindex(columns=tickers)
     adjusted_close.index.name = "Date"
 
-    # Remove rows with any missing prices so every return uses the same dates.
+    # Rimuoviamo date incomplete così i rendimenti sono confrontabili.
     return adjusted_close.dropna(how="any")
 
 
@@ -50,13 +52,13 @@ def split_train_test_by_last_calendar_month(
     prices: pd.DataFrame,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Split prices into training data and the most recent calendar month."""
+    # Usiamo il mese più recente come periodo di test fuori campione.
     latest_date = prices.index.max()
     is_test_month = (prices.index.year == latest_date.year) & (
         prices.index.month == latest_date.month
     )
 
-    # Exclude the final calendar month from estimation to avoid look-ahead bias:
-    # it is reserved as an out-of-sample test period.
+    # Escludiamo il mese finale dalla stima per evitare look-ahead bias.
     train_prices = prices.loc[~is_test_month]
     test_prices = prices.loc[is_test_month]
 
@@ -88,16 +90,20 @@ def print_sample_summary(
 
 def main() -> None:
     """Download prices, compute log returns, save both datasets, and print a summary."""
+    # Creiamo le cartelle di output prima di salvare i CSV.
     RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
     PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Scarichiamo i prezzi e separiamo training set e test set.
     prices = download_adjusted_close_prices(TICKERS)
     train_prices, test_prices = split_train_test_by_last_calendar_month(prices)
 
+    # Calcoliamo i rendimenti logaritmici per ogni campione.
     log_returns_full = compute_log_returns(prices)
     log_returns_train = compute_log_returns(train_prices)
     log_returns_test = compute_log_returns(test_prices)
 
+    # Salviamo sia i dati completi sia quelli divisi per analisi successive.
     prices.to_csv(ADJUSTED_CLOSE_FULL_PATH)
     train_prices.to_csv(ADJUSTED_CLOSE_TRAIN_PATH)
     test_prices.to_csv(ADJUSTED_CLOSE_TEST_PATH)
@@ -105,9 +111,11 @@ def main() -> None:
     log_returns_train.to_csv(LOG_RETURNS_TRAIN_PATH)
     log_returns_test.to_csv(LOG_RETURNS_TEST_PATH)
 
+    # Manteniamo i percorsi storici puntati al training set usato dal progetto.
     train_prices.to_csv(ADJUSTED_CLOSE_PATH)
     log_returns_train.to_csv(LOG_RETURNS_PATH)
 
+    # Stampiamo un riepilogo rapido per controllare date e osservazioni.
     print_sample_summary("Full", prices, log_returns_full)
     print_sample_summary("Training", train_prices, log_returns_train)
     print_sample_summary("Test", test_prices, log_returns_test)

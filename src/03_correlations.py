@@ -33,12 +33,14 @@ def compute_correlation_matrix(log_returns: pd.DataFrame) -> pd.DataFrame:
 
 def compute_pvalue_matrix(log_returns: pd.DataFrame) -> pd.DataFrame:
     """Compute Pearson correlation p-values for each pair of return series."""
+    # Inizializziamo una matrice con gli stessi ticker su righe e colonne.
     p_values = pd.DataFrame(
         index=log_returns.columns,
         columns=log_returns.columns,
         dtype=float,
     )
 
+    # Calcoliamo il p-value di Pearson per ogni coppia di asset.
     for row_name in log_returns.columns:
         for column_name in log_returns.columns:
             _, p_value = stats.pearsonr(log_returns[row_name], log_returns[column_name])
@@ -80,6 +82,7 @@ def plot_correlation_heatmap(
     output_path: Path,
 ) -> None:
     """Create a matplotlib heatmap with Pearson correlation values."""
+    # La scala va da -1 a 1 per rappresentare correttamente le correlazioni.
     fig, ax = plt.subplots(figsize=(8, 6))
     image = ax.imshow(correlation_matrix, cmap="coolwarm", vmin=-1, vmax=1)
 
@@ -89,6 +92,7 @@ def plot_correlation_heatmap(
     ax.set_yticks(range(len(correlation_matrix.index)))
     ax.set_yticklabels(correlation_matrix.index)
 
+    # Scriviamo il valore numerico dentro ogni cella della heatmap.
     for row_index, row_name in enumerate(correlation_matrix.index):
         for column_index, column_name in enumerate(correlation_matrix.columns):
             value = correlation_matrix.loc[row_name, column_name]
@@ -111,15 +115,18 @@ def plot_correlation_heatmap(
 
 def main() -> None:
     """Compute correlations for log returns and save the table and heatmap."""
+    # Prepariamo le cartelle dove salvare CSV e grafico.
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Carichiamo i rendimenti e calcoliamo correlazioni, p-value e significatività.
     log_returns = read_log_returns(LOG_RETURNS_PATH)
     correlation_matrix = compute_correlation_matrix(log_returns)
     pvalue_matrix = compute_pvalue_matrix(log_returns)
     formatted_pvalue_matrix = compute_formatted_pvalue_matrix(pvalue_matrix)
     significance_matrix = compute_significance_matrix(pvalue_matrix)
 
+    # Salviamo sia i valori numerici sia le versioni formattate per il report.
     correlation_matrix.to_csv(CORRELATION_MATRIX_PATH)
     pvalue_matrix.to_csv(CORRELATION_PVALUES_PATH)
     formatted_pvalue_matrix.to_csv(CORRELATION_PVALUES_FORMATTED_PATH)

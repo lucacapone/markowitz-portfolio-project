@@ -38,6 +38,7 @@ def validate_and_reindex_log_returns(
     log_returns: pd.DataFrame, tickers: list[str] = TICKERS
 ) -> pd.DataFrame:
     """Validate that expected tickers are present and order columns consistently."""
+    # Verifichiamo che il dataset contenga tutti i titoli richiesti.
     missing_tickers = set(tickers) - set(log_returns.columns)
     if missing_tickers:
         raise ValueError(f"Missing expected tickers: {sorted(missing_tickers)}")
@@ -46,6 +47,7 @@ def validate_and_reindex_log_returns(
 
 def annualize_returns(log_returns: pd.DataFrame) -> tuple[pd.Series, pd.DataFrame]:
     """Compute annualized expected returns and covariance matrix."""
+    # Annualizziamo media e covarianza assumendo 252 giorni di borsa aperta.
     mean_daily_returns = log_returns.mean()
     daily_covariance_matrix = log_returns.cov()
     return (
@@ -60,11 +62,14 @@ def compute_portfolio_metrics(
     annual_covariance_matrix: pd.DataFrame,
 ) -> tuple[float, float, float]:
     """Compute annual return, volatility, and Sharpe ratio for one portfolio."""
+    # Il rendimento è la media ponderata dei rendimenti attesi annuali.
     portfolio_return = float(np.dot(weights, annual_returns))
+    # La varianza usa pesi e matrice di covarianza annualizzata.
     portfolio_variance = float(
         weights.T @ annual_covariance_matrix.to_numpy() @ weights
     )
     portfolio_volatility = float(np.sqrt(portfolio_variance))
+    # Lo Sharpe misura rendimento extra per unità di rischio.
     sharpe_ratio = (portfolio_return - RISK_FREE_RATE) / portfolio_volatility
     return portfolio_return, portfolio_volatility, sharpe_ratio
 
@@ -75,10 +80,12 @@ def simulate_random_portfolios(
     n_portfolios: int = N_PORTFOLIOS,
 ) -> pd.DataFrame:
     """Generate random long-only portfolios and calculate their metrics."""
+    # Fissiamo il seed per ottenere simulazioni riproducibili.
     rng = np.random.default_rng(RANDOM_SEED)
     records = []
 
     for _ in range(n_portfolios):
+        # Generiamo pesi long-only e li normalizziamo affinché sommino a 1.
         weights = rng.random(len(annual_returns))
         weights = weights / weights.sum()
         portfolio_return, portfolio_volatility, sharpe_ratio = compute_portfolio_metrics(
@@ -116,8 +123,10 @@ def build_efficient_frontier(
 ) -> pd.DataFrame:
     """Build the long-only efficient frontier using constrained optimization."""
     n_assets = len(annual_returns)
+    # I vincoli long-only impediscono pesi negativi o superiori al 100%.
     bounds = [(0.0, 1.0)] * n_assets
     initial_weights = np.repeat(1.0 / n_assets, n_assets)
+    # Scorriamo rendimenti obiettivo per tracciare la frontiera efficiente.
     target_returns = np.linspace(annual_returns.min(), annual_returns.max(), n_points)
     frontier_records = []
 
@@ -127,6 +136,7 @@ def build_efficient_frontier(
         )[1]
 
     for target_return in target_returns:
+        # Vincoliamo la somma dei pesi a 1 e il rendimento al target corrente.
         constraints = (
             {"type": "eq", "fun": lambda weights: np.sum(weights) - 1.0},
             {
@@ -145,7 +155,7 @@ def build_efficient_frontier(
         )
 
         if not result.success:
-            # Skip rare numerical failures while keeping the frontier from valid targets.
+            # Saltiamo rari errori numerici e manteniamo i target validi.
             continue
 
         portfolio_return, portfolio_volatility_value, _ = compute_portfolio_metrics(
@@ -171,20 +181,24 @@ def evaluate_out_of_sample(
     evaluation of the portfolios selected with training data.
     """
     records = []
+    # Recuperiamo le colonne dei pesi usando lo stesso ordine del training set.
     weight_columns = [f"{ticker} weight" for ticker in train_log_returns.columns]
     number_of_test_trading_days = len(test_log_returns)
 
     for portfolio_name, portfolio in portfolios.items():
+        # Applichiamo al mese di test i pesi scelti solo sui dati di training.
         weights = portfolio.loc[:, weight_columns].iloc[0].to_numpy(dtype=float)
         portfolio_mean_daily_log_return_train = float(
             np.dot(weights, train_log_returns.mean())
         )
+        # Proiettiamo il rendimento medio giornaliero sul numero di giorni di test.
         expected_monthly_log_return = (
             portfolio_mean_daily_log_return_train * number_of_test_trading_days
         )
         expected_monthly_simple_return = float(
             np.exp(expected_monthly_log_return) - 1
         )
+        # Sommiamo i rendimenti giornalieri realizzati per ottenere il mese effettivo.
         daily_test_portfolio_log_returns = test_log_returns.to_numpy() @ weights
         realized_monthly_log_return = float(daily_test_portfolio_log_returns.sum())
         realized_monthly_simple_return = float(np.exp(realized_monthly_log_return) - 1)
@@ -213,6 +227,7 @@ def plot_efficient_frontier(
     output_path: Path,
 ) -> None:
     """Plot simulated portfolios, the efficient frontier, and key portfolios."""
+    # Ogni punto rappresenta un portafoglio simulato, colorato per Sharpe ratio.
     fig, ax = plt.subplots(figsize=(10, 6))
     scatter = ax.scatter(
         portfolios["Volatility"],
@@ -222,6 +237,7 @@ def plot_efficient_frontier(
         s=12,
         alpha=0.5,
     )
+    # La linea rossa mostra i portafogli efficienti stimati via ottimizzazione.
     ax.plot(
         efficient_frontier["Volatility"],
         efficient_frontier["Return"],
@@ -229,6 +245,7 @@ def plot_efficient_frontier(
         linewidth=2,
         label="Efficient Frontier",
     )
+    # Evidenziamo il portafoglio a rischio minimo tra quelli simulati.
     ax.scatter(
         minimum_variance["Volatility"],
         minimum_variance["Return"],
@@ -243,6 +260,7 @@ def plot_efficient_frontier(
         portfolios["Volatility"].max(),
         efficient_frontier["Volatility"].max(),
     )
+    # Aggiungiamo una guida orizzontale dal portafoglio a minima varianza.
     ax.hlines(
         y=min_var_return,
         xmin=min_var_volatility,
@@ -252,6 +270,7 @@ def plot_efficient_frontier(
         linewidth=1.5,
         label="Rendimento del portafoglio a minima varianza",
     )
+    # Evidenziamo il portafoglio con il migliore rapporto rendimento/rischio.
     ax.scatter(
         maximum_sharpe["Volatility"],
         maximum_sharpe["Return"],
@@ -276,23 +295,27 @@ def plot_efficient_frontier(
 
 def main() -> None:
     """Run the Markowitz portfolio simulation and save all outputs."""
+    # Prepariamo le cartelle per risultati numerici e grafici.
     PORTFOLIOS_DIR.mkdir(parents=True, exist_ok=True)
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Carichiamo il training set usato per stimare rendimenti e covarianze.
     train_log_returns = validate_and_reindex_log_returns(
         read_log_returns(LOG_RETURNS_PATH)
     )
-    # The test month is held out from estimation and used only for ex-post
-    # out-of-sample evaluation after portfolio weights are selected.
+    # Il mese di test resta escluso dalla stima e serve solo alla valutazione.
     test_log_returns = validate_and_reindex_log_returns(
         read_log_returns(TEST_LOG_RETURNS_PATH)
     )
 
+    # Convertiamo statistiche giornaliere in input annualizzati per Markowitz.
     annual_returns, annual_covariance_matrix = annualize_returns(train_log_returns)
 
+    # Simuliamo portafogli casuali e identifichiamo quelli più interessanti.
     portfolios = simulate_random_portfolios(annual_returns, annual_covariance_matrix)
     minimum_variance, maximum_sharpe = find_extreme_portfolios(portfolios)
     efficient_frontier = build_efficient_frontier(annual_returns, annual_covariance_matrix)
+    # Valutiamo fuori campione i portafogli scelti sul training set.
     out_of_sample_evaluation = evaluate_out_of_sample(
         {
             "Minimum Variance Portfolio": minimum_variance,
@@ -302,6 +325,7 @@ def main() -> None:
         test_log_returns,
     )
 
+    # Salviamo output tabellari e figura finale della frontiera efficiente.
     portfolios.to_csv(PORTFOLIO_SIMULATION_PATH, index=False)
     minimum_variance.to_csv(MINIMUM_VARIANCE_PATH, index=False)
     maximum_sharpe.to_csv(MAXIMUM_SHARPE_PATH, index=False)

@@ -137,18 +137,61 @@ Nel complesso, la struttura delle correlazioni suggerisce che i titoli seleziona
 
 ## 5.2 Significatività statistica delle correlazioni
 
-Per integrare l'analisi descrittiva della matrice di correlazione, è stata valutata anche la significatività statistica dei coefficienti di Pearson. Per ciascuna coppia di titoli il test considera come ipotesi nulla \(H_0: \rho = 0\), ossia assenza di correlazione lineare nella popolazione. Il p-value associato misura la probabilità di osservare un coefficiente campionario almeno altrettanto estremo di quello stimato, qualora l'ipotesi nulla fosse vera. Valori piccoli del p-value portano quindi a rifiutare (H_0) e indicano che la correlazione osservata è statisticamente significativa.
 
-Dal punto di vista operativo, per ogni coppia di titoli è stata prima calcolata la correlazione campionaria di Pearson, indicata con (r). Tale coefficiente è stato poi trasformato in una statistica (t), secondo la formula:
+Per completare l’analisi descrittiva della matrice di correlazione, è stata valutata anche la **significatività statistica** dei coefficienti di correlazione di Pearson.
 
-\[
+La matrice di correlazione permette di osservare **quanto due titoli tendano a muoversi insieme**, ma non consente da sola di stabilire se la relazione osservata sia effettivamente significativa oppure se possa essere dovuta al caso.
+
+Per questo motivo, per ogni coppia di titoli è stato effettuato un test statistico sul coefficiente di correlazione di Pearson.
+
+L’ipotesi nulla del test è:
+
+$$
+H_0: \rho = 0
+$$
+
+dove \(\rho\) rappresenta la correlazione nella popolazione.  
+L’ipotesi nulla afferma quindi che **non esiste una relazione lineare significativa tra i rendimenti dei due titoli**.
+
+Per ciascuna coppia di titoli viene calcolato il coefficiente di correlazione campionario, indicato con \(r\). Successivamente, tale coefficiente viene trasformato nella seguente statistica test:
+
+$$
 t = r \sqrt{\frac{n-2}{1-r^2}}
-\]
+$$
 
-dove (n) rappresenta il numero di osservazioni, cioè il numero di rendimenti giornalieri disponibili nel campione di training. La statistica (t) viene confrontata con una distribuzione t di Student con (n-2) gradi di libertà, al fine di ottenere il corrispondente p-value.
+dove \(n\) indica il numero di osservazioni disponibili, cioè il numero di rendimenti giornalieri presenti nel campione di training.
 
-La matrice dei p-value completa quindi l’analisi della heatmap delle correlazioni. La heatmap mostra l’intensità e la direzione della relazione lineare tra i rendimenti dei titoli, mentre la matrice p-value indica se tali relazioni risultano statisticamente diverse da zero. Pertanto, le due rappresentazioni devono essere lette congiuntamente: la matrice di correlazione e la heatmap descrivono la forza e il segno del legame, mentre la matrice p-value ne valuta la significatività statistica.
+La statistica \(t\) viene confrontata con una distribuzione **t di Student** con \(n-2\) gradi di libertà. A partire da questa distribuzione viene calcolato il relativo **p-value**.
 
+Il **p-value** indica quanto il coefficiente di correlazione osservato sia compatibile con l’ipotesi nulla di assenza di correlazione. Un p-value basso segnala una bassa compatibilità con tale ipotesi e porta quindi a considerare la correlazione statisticamente significativa.
+
+Se il p-value è inferiore a un determinato livello di significatività, ad esempio il **5%**, si rifiuta l’ipotesi nulla e si conclude che la correlazione tra i due titoli è **statisticamente significativa**.
+
+Al contrario, un p-value elevato non consente di rifiutare l’ipotesi nulla, indicando che non vi è sufficiente evidenza statistica per affermare l’esistenza di una correlazione lineare diversa da zero.
+
+## Interpretazione congiunta di correlazioni e p-value
+
+La matrice dei p-value integra le informazioni fornite dalla matrice di correlazione e dalla relativa heatmap.
+
+La **heatmap delle correlazioni** mostra:
+
+- il **segno** della relazione lineare tra i rendimenti;
+- l’**intensità** della relazione;
+- la direzione del movimento congiunto dei titoli.
+
+In particolare:
+
+- valori positivi indicano che i titoli tendono a muoversi nella stessa direzione;
+- valori negativi indicano che i titoli tendono a muoversi in direzioni opposte;
+- valori vicini a zero indicano una relazione lineare debole.
+
+La **matrice dei p-value**, invece, permette di verificare se tali relazioni siano statisticamente significative.
+
+Di conseguenza, le due matrici devono essere interpretate insieme:
+
+- la matrice di correlazione descrive **quanto forte e in quale direzione** sia il legame tra i titoli;
+- la matrice dei p-value valuta **quanto tale legame sia statisticamente affidabile**.
+- 
 La matrice dei p-value formattati è la seguente:
 
 |      | AAPL | JPM | KO | JNJ | XOM | BA |

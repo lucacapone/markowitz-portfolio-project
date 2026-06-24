@@ -191,7 +191,7 @@ Di conseguenza, le due matrici devono essere interpretate insieme:
 
 - la matrice di correlazione descrive **quanto forte e in quale direzione** sia il legame tra i titoli;
 - la matrice dei p-value valuta **quanto tale legame sia statisticamente affidabile**.
-- 
+  
 La matrice dei p-value formattati è la seguente:
 
 |      | AAPL | JPM | KO | JNJ | XOM | BA |
@@ -203,9 +203,15 @@ La matrice dei p-value formattati è la seguente:
 | XOM  | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 |
 | BA   | <0.001 | <0.001 | <0.001 | 0.012 | <0.001 | <0.001 |
 
-I risultati mostrano che quasi tutti i p-value sono inferiori a 0.001, segnalando una forte evidenza statistica contro l'ipotesi di correlazione nulla. L'unica eccezione relativa è la coppia JNJ--BA, per la quale il p-value è pari a 0.012: tale valore è comunque inferiore alla soglia del 5%, quindi la correlazione risulta statisticamente significativa. Tuttavia, il coefficiente stimato è molto basso, pari a circa 0.071, e deve essere interpretato come economicamente debole. Questo punto è importante perché la significatività statistica non implica necessariamente rilevanza economica: con un numero elevato di osservazioni, anche relazioni lineari molto contenute possono risultare statisticamente diverse da zero.
-esi nulla fosse vera. Valori piccoli del p-value portano quindi a rifiutare \(H_0\) e indicano che la correlazione osservata è statisticamente significativa.
+I risultati mostrano che quasi tutti i p-value sono inferiori a 0.001, segnalando una forte evidenza statistica contro l'ipotesi di correlazione nulla. L'unica eccezione relativa è la coppia JNJ--BA, per la quale il p-value è pari a 0.012: tale valore è comunque inferiore alla soglia del 5%, quindi la correlazione risulta statisticamente significativa. 
+Tuttavia, il coefficiente stimato è molto basso, pari a circa 0.071, e deve essere interpretato come economicamente debole. Valori piccoli del p-value portano quindi a rifiutare \(H_0\) e indicano che la correlazione osservata è statisticamente significativa.
+È importante sottolineare che una correlazione statisticamente significativa non è necessariamente anche rilevante dal punto di vista economico. 
 
+Infatti, quando il numero di osservazioni è elevato, il test statistico può individuare come significative anche correlazioni molto basse. In questi casi, il p-value può risultare piccolo e portare al rifiuto dell’ipotesi nulla, ma il legame tra i due titoli può comunque essere debole e poco utile dal punto di vista pratico.
+
+Per questo motivo, la significatività statistica deve essere interpretata insieme al valore del coefficiente di correlazione. Il p-value indica se la correlazione è statisticamente diversa da zero, mentre il coefficiente di correlazione indica quanto è forte il legame tra i rendimenti.
+
+Di conseguenza, una correlazione può essere statisticamente significativa ma avere un impatto economico limitato se il valore di \(r\) è vicino a zero. 
 # 6. Applicazione del modello di Markowitz
 
 L'applicazione empirica del modello di Markowitz richiede, in primo luogo, la trasformazione delle serie storiche dei prezzi rettificati in rendimenti giornalieri e la successiva stima dei parametri fondamentali dell'analisi media-varianza. Il rendimento atteso di ciascun titolo è stato stimato come media aritmetica dei rendimenti giornalieri osservati nel campione. Tale grandezza rappresenta una misura sintetica della performance media storica e costituisce il punto di partenza per il calcolo del rendimento atteso di ogni portafoglio ammissibile.

@@ -1,0 +1,3 @@
+Portfolio,Expected Monthly Log Return,Expected Monthly Simple Return,Realized Monthly Log Return,Realized Monthly Simple Return,Forecast Error,Number of Test Days
+Minimum Variance Portfolio,0.006320572814138272,0.006340589785172934,0.004438594999677019,0.004448460152868705,-0.0018921296323042291,14
+Maximum Sharpe Portfolio,0.008315576636439104,0.00835024707877885,-0.002117721130211913,-0.0021154803408872658,-0.010465727419666115,14

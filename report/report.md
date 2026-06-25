@@ -300,19 +300,13 @@ La simulazione casuale serve a esplorare lo spazio dei portafogli ammissibili e 
 
 Formalmente, per ogni rendimento target viene risolto il seguente problema:
 
-[
-\min_w \quad w^T \Sigma w
-]
+$$ \min_w \quad w^T \Sigma w $$
 
 soggetto a:
 
-[
-w^T \mu = \mu_{target}
-]
+$$ w^T \mu = \mu_{target} $$
 
-[
-\sum_i w_i = 1, \qquad 0 \leq w_i \leq 1
-]
+$$ \sum_i w_i = 1, \qquad 0 \leq w_i \leq 1 $$
 
 L’insieme dei portafogli ottenuti per i diversi livelli di rendimento target costituisce la frontiera efficiente. Di conseguenza, mentre i 10.000 portafogli simulati rappresentano una descrizione approssimata dello spazio delle allocazioni possibili, la frontiera efficiente deriva da un procedimento di ottimizzazione numerica più strutturato.
 

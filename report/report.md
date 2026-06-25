@@ -52,6 +52,8 @@ Sulla base di questi richiami teorici, l'analisi empirica applica il modello di 
 
 La base informativa utilizzata per l'analisi è costituita da dati storici di mercato provenienti da Yahoo Finance, una fonte ampiamente impiegata nelle applicazioni empiriche di finanza per l'accesso a serie temporali di prezzi azionari. I dati sono stati raccolti con frequenza giornaliera, in modo da osservare con sufficiente dettaglio la dinamica dei prezzi e dei rendimenti nel tempo. L'orizzonte temporale complessivo considerato copre approssimativamente gli ultimi cinque anni, dal 22 giugno 2021 al 22 giugno 2026. Al fine di rendere più rigorosa la valutazione empirica, il mese più recente è stato escluso dal campione utilizzato per la stima: il campione di training comprende il periodo dal 22 giugno 2021 al 29 maggio 2026, mentre il campione di test comprende esclusivamente il periodo dal 1 giugno 2026 al 22 giugno 2026. In questo modo, rendimenti attesi, matrice di covarianza, correlazioni e pesi dei portafogli ottimali sono stimati soltanto sui dati disponibili nel campione di training, mentre l'ultimo mese viene impiegato unicamente per una verifica fuori campione della performance realizzata. Tale separazione tra periodo di stima e periodo di valutazione evita l'introduzione di look-ahead bias, poiché le informazioni del mese finale non contribuiscono alla costruzione dei portafogli.
 
+Operativamente, la raccolta e la preparazione dei dati sono state effettuate nello script `src/01_download_data.py`, che interroga Yahoo Finance tramite la libreria `yfinance` con frequenza giornaliera e `auto_adjust=False`, così da poter estrarre esplicitamente la colonna `Adj Close`. Dopo il download congiunto dei sei ticker, le serie vengono riordinate secondo una sequenza fissa e vengono eliminate le date con osservazioni incomplete, in modo che tutti i titoli presentino lo stesso calendario di rendimenti confrontabili. Lo stesso script salva sia il campione completo sia la separazione tra training e test, mantenendo inoltre i percorsi storici `data/raw/adjusted_close_prices.csv` e `data/processed/log_returns.csv` puntati al training set utilizzato nelle successive elaborazioni.
+
 Il campione è composto da sei titoli azionari quotati sul mercato statunitense: Apple (AAPL), JPMorgan Chase (JPM), Coca-Cola (KO), Johnson & Johnson (JNJ), Exxon Mobil (XOM) e Boeing (BA). La selezione di tali società risponde all'esigenza di costruire un insieme di attività rappresentativo di settori economici differenti. Apple appartiene al comparto tecnologico, JPMorgan Chase al settore finanziario, Coca-Cola ai beni di consumo difensivi, Johnson & Johnson al settore sanitario, Exxon Mobil all'energia e Boeing all'industria aerospaziale e manifatturiera. Tale eterogeneità settoriale è rilevante perché riduce la concentrazione dell'analisi su un'unica area dell'economia e permette di valutare in modo più appropriato i potenziali benefici della diversificazione.
 
 Per ciascun titolo sono stati utilizzati i prezzi di chiusura rettificati, indicati come *Adjusted Close*. Questa variabile incorpora gli effetti di eventi societari quali dividendi, frazionamenti azionari e altre rettifiche rilevanti, fornendo pertanto una misura più coerente del rendimento effettivamente conseguibile dall'investitore rispetto al semplice prezzo di chiusura non rettificato. L'impiego dei prezzi rettificati è particolarmente importante quando si analizzano serie storiche su un orizzonte pluriennale, poiché consente di evitare distorsioni nella misurazione della performance.
@@ -63,6 +65,8 @@ r_t = \ln\left(\frac{P_t}{P_{t-1}}\right)
 $$
 
 I rendimenti logaritmici sono preferiti in molte applicazioni finanziarie perché risultano additivi nel tempo e facilitano l'aggregazione dei rendimenti su orizzonti temporali più lunghi. Inoltre, per variazioni di prezzo contenute, essi sono molto vicini ai rendimenti semplici, ma presentano proprietà analitiche più convenienti nell'ambito della modellizzazione statistica e dell'analisi di portafoglio.
+
+Coerentemente con questa impostazione, tutte le statistiche descrittive successive sono calcolate sui rendimenti logaritmici giornalieri del solo training set, come previsto dallo script `src/02_descriptive_analysis.py`. Tale scelta garantisce che media, deviazione standard, minimi, massimi, skewness e kurtosis sintetizzino esclusivamente l'informazione disponibile nella fase di stima, mentre il mese finale rimane riservato alla verifica fuori campione.
 
 # 4. Analisi descrittiva
 
@@ -109,6 +113,8 @@ La correlazione positiva si verifica quando due attività tendono a registrare r
 
 Nel quadro di Markowitz, le correlazioni basse o negative sono essenziali perché permettono di ridurre la varianza complessiva del portafoglio a parità di rendimenti attesi individuali. La logica media-varianza mostra infatti che il rischio di portafoglio dipende non solo dalle varianze dei singoli titoli, ma anche dalle covarianze, le quali sono direttamente collegate alle correlazioni. Pertanto, la selezione di attività con correlazioni contenute consente di costruire combinazioni più efficienti, migliorando il profilo rischio-rendimento rispetto a un investimento concentrato in titoli fortemente correlati.
 
+La stima empirica delle relazioni tra i titoli è stata svolta nello script `src/03_correlations.py` sui rendimenti logaritmici del training set. In particolare, la matrice riportata di seguito è una matrice di correlazione di Pearson, ottenuta applicando il metodo `pearson` alle serie giornaliere dei rendimenti. Questa scelta è coerente con il modello media-varianza, poiché misura la dipendenza lineare tra le attività e fornisce un'informazione direttamente collegata alla matrice di covarianza utilizzata nella successiva ottimizzazione di portafoglio.
+
 ## 5.1 Matrice di correlazione
 
 |      | AAPL | JPM | KO | JNJ | XOM | BA |
@@ -142,7 +148,7 @@ Per completare l’analisi descrittiva della matrice di correlazione, è stata v
 
 La matrice di correlazione permette di osservare **quanto due titoli tendano a muoversi insieme**, ma non consente da sola di stabilire se la relazione osservata sia effettivamente significativa oppure se possa essere dovuta al caso.
 
-Per questo motivo, per ogni coppia di titoli è stato effettuato un test statistico sul coefficiente di correlazione di Pearson.
+Per questo motivo, per ogni coppia di titoli è stato effettuato un test statistico sul coefficiente di correlazione di Pearson. Nello script `src/03_correlations.py` la matrice dei p-value viene costruita applicando `scipy.stats.pearsonr` a ciascuna coppia di serie di rendimenti logaritmici; il primo valore restituito dalla funzione corrisponde al coefficiente di correlazione, mentre il secondo è il p-value associato al test di assenza di correlazione lineare.
 
 L’ipotesi nulla del test è:
 
@@ -216,6 +222,8 @@ Di conseguenza, una correlazione può essere statisticamente significativa ma av
 
 L'applicazione empirica del modello di Markowitz richiede, in primo luogo, la trasformazione delle serie storiche dei prezzi rettificati in rendimenti giornalieri e la successiva stima dei parametri fondamentali dell'analisi media-varianza. Il rendimento atteso di ciascun titolo è stato stimato come media aritmetica dei rendimenti giornalieri osservati nel campione. Tale grandezza rappresenta una misura sintetica della performance media storica e costituisce il punto di partenza per il calcolo del rendimento atteso di ogni portafoglio ammissibile.
 
+L'intera procedura di simulazione e ottimizzazione è implementata nello script `src/04_markowitz_simulation.py`, che utilizza come input i rendimenti logaritmici del training set salvati in `data/processed/log_returns.csv`. Prima dell'ottimizzazione, lo script verifica che tutti i ticker attesi siano presenti e li riordina in modo coerente, così da mantenere identica la corrispondenza tra vettore dei pesi, rendimenti attesi e matrice di covarianza. Questa fase è metodologicamente rilevante perché il modello di Markowitz è sensibile all'allineamento tra attività e parametri stimati.
+
 Poiché l'analisi è espressa su base annua, i rendimenti medi giornalieri sono stati annualizzati assumendo 252 giorni di negoziazione in un anno. Indicando con \(\mu_{daily}\) il rendimento medio giornaliero, il rendimento annuo atteso è stato calcolato secondo la seguente relazione:
 
 $$
@@ -239,6 +247,8 @@ SR = \frac{\mu_p}{\sigma_p}
 $$
 
 La costruzione della frontiera efficiente è stata realizzata individuando, tra le combinazioni ammissibili, i portafogli che presentano il livello minimo di volatilità per ciascun rendimento atteso oppure, in modo equivalente, il rendimento atteso massimo per ciascun livello di rischio. La frontiera efficiente rappresenta quindi l'insieme delle allocazioni dominanti nel piano rischio-rendimento. I portafogli collocati al di sotto di essa sono inefficienti, poiché esistono combinazioni alternative in grado di offrire un rendimento superiore a parità di volatilità oppure una volatilità inferiore a parità di rendimento atteso.
+
+Dal punto di vista computazionale, i 10.000 portafogli casuali costituiscono una rappresentazione simulata dello spazio delle allocazioni long-only e permettono di identificare, tra le simulazioni generate, il portafoglio a minima varianza e quello con massimo Sharpe Ratio. La frontiera efficiente, invece, non è ricavata semplicemente unendo i punti simulati, ma viene calcolata con un'ottimizzazione vincolata tramite metodo SLSQP: per una griglia di rendimenti obiettivo, l'algoritmo minimizza la volatilità rispettando simultaneamente il vincolo di pieno investimento e i limiti \(0 \leq w_i \leq 1\). La verifica fuori campione utilizza infine gli stessi pesi stimati sul training set, senza ricalibrarli sui dati del mese di test.
 
 # 7. Risultati
 
@@ -322,9 +332,13 @@ La figura `figures/efficient_frontier.png` rappresenta la frontiera efficiente g
 
 La separazione tra campione di training e campione di test consente di valutare se i portafogli ottimali, costruiti utilizzando soltanto le informazioni disponibili fino al 29 maggio 2026, mantengano una performance coerente anche nel mese successivo, escluso dalla stima. La verifica fuori campione è condotta sul periodo dal 1 giugno 2026 al 22 giugno 2026, pari a 14 giorni di negoziazione, confrontando il rendimento mensile semplice atteso con il rendimento mensile semplice effettivamente realizzato.
 
+Questa verifica è coerente con la procedura dello script `src/04_markowitz_simulation.py`: i pesi del portafoglio a minima varianza e del portafoglio con massimo Sharpe Ratio sono quelli individuati esclusivamente sul training set e vengono mantenuti invariati durante il mese di test. Pertanto, la valutazione non rappresenta una nuova ottimizzazione ex post, ma un'applicazione fuori campione delle decisioni di allocazione ottenute in precedenza.
+
 Dal punto di vista metodologico, il rendimento mensile semplice atteso deriva dal rendimento atteso annualizzato stimato nel campione di training. Dopo aver calcolato i rendimenti logaritmici giornalieri dei titoli, la loro media è stata annualizzata moltiplicandola per 252 giorni di negoziazione. Il rendimento atteso del portafoglio è stato poi ottenuto come media ponderata dei rendimenti attesi dei singoli titoli, utilizzando i pesi stimati per ciascun portafoglio. Poiché il periodo di test comprende 14 giorni di negoziazione, il rendimento atteso annualizzato è stato riportato alla durata del test e convertito in rendimento semplice.
 
 Il rendimento mensile semplice realizzato, invece, è stato calcolato utilizzando i rendimenti effettivamente osservati nel periodo di test. In particolare, i rendimenti logaritmici giornalieri sono stati sommati nel periodo considerato, sfruttando la loro proprietà di additività nel tempo, e successivamente convertiti in rendimento semplice. Infine, il rendimento realizzato del portafoglio è stato ottenuto combinando i rendimenti realizzati dei singoli titoli con i pesi stimati nel campione di training. In questo modo, il confronto tra rendimento atteso e rendimento realizzato consente di valutare la capacità dei portafogli costruiti sui dati storici di produrre risultati coerenti anche fuori campione.
+
+Più precisamente, per ciascun portafoglio lo script calcola dapprima il rendimento logaritmico medio giornaliero atteso come prodotto tra il vettore dei pesi e la media dei rendimenti logaritmici del training set. Tale valore viene moltiplicato per il numero effettivo di giorni di negoziazione nel test e poi trasformato in rendimento semplice mediante \(\exp(r)-1\). Il rendimento realizzato segue la stessa logica di conversione: i rendimenti logaritmici giornalieri del portafoglio nel test vengono sommati e quindi convertiti in rendimento semplice. L'errore di previsione è infine definito come differenza tra rendimento semplice realizzato e rendimento semplice atteso.
 
 | Portafoglio | Rendimento mensile semplice atteso | Rendimento mensile semplice realizzato | Errore di previsione | Giorni di test |
 |-------------|------------------------------------|----------------------------------------|----------------------|----------------|

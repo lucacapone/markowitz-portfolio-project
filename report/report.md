@@ -76,12 +76,12 @@ L'analisi descrittiva costituisce una fase preliminare essenziale nello studio d
 
 | Titolo | Media | Deviazione Standard | Minimo | Massimo | Skewness | Kurtosis |
 |---------|---------|---------|---------|---------|---------|---------|
-| AAPL | 0.000660 | 0.017270 | -0.097013 | 0.142617 | 0.245127 | 5.901085 |
-| JPM | 0.000667 | 0.015392 | -0.077787 | 0.109254 | -0.050387 | 4.633102 |
-| KO | 0.000429 | 0.010202 | -0.072169 | 0.046168 | -0.235207 | 3.741206 |
-| JNJ | 0.000412 | 0.010623 | -0.078953 | 0.060090 | -0.009126 | 4.947567 |
-| XOM | 0.000834 | 0.016891 | -0.082136 | 0.062142 | -0.307373 | 1.428977 |
-| BA | -0.000090 | 0.023065 | -0.110608 | 0.143010 | -0.132429 | 3.426757 |
+| AAPL | 0.000703 | 0.017276 | -0.097013 | 0.142617 | 0.248562 | 5.971457 |
+| JPM | 0.000658 | 0.015378 | -0.077787 | 0.109254 | -0.049936 | 4.720601 |
+| KO | 0.000413 | 0.010108 | -0.072168 | 0.046168 | -0.269165 | 3.871000 |
+| JNJ | 0.000372 | 0.010613 | -0.078953 | 0.060090 | -0.010907 | 5.034804 |
+| XOM | 0.000813 | 0.016823 | -0.082136 | 0.062142 | -0.316088 | 1.492777 |
+| BA | -0.000043 | 0.023039 | -0.110608 | 0.143010 | -0.150880 | 3.490003 |
 
 Le statistiche riportate evidenziano una significativa eterogeneità tra i rendimenti giornalieri dei sei titoli. In termini di rendimento medio, Exxon Mobil presenta il valore più elevato, pari a 0.000834, segnalando la performance media giornaliera più favorevole nel campione considerato. Anche JPMorgan Chase e Apple mostrano rendimenti medi positivi e relativamente elevati, rispettivamente pari a 0.000667 e 0.000660. Coca-Cola e Johnson & Johnson registrano rendimenti medi più contenuti, ma comunque positivi, coerentemente con la natura più difensiva dei rispettivi settori. Boeing, al contrario, presenta un rendimento medio negativo, pari a -0.000090, indicando che nel periodo osservato il titolo ha avuto una performance media giornaliera inferiore rispetto agli altri strumenti analizzati.
 

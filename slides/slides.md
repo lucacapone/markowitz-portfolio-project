@@ -95,12 +95,12 @@ rt = ln(Pt / Pt−1)
 
 | Titolo | Rendimento medio | Volatilità |
 | ------ | ---------------- | ---------- |
-| AAPL   | 0.000660         | 0.017270   |
-| JPM    | 0.000667         | 0.015392   |
-| KO     | 0.000429         | 0.010202   |
-| JNJ    | 0.000412         | 0.010623   |
-| XOM    | 0.000834         | 0.016891   |
-| BA     | -0.000090        | 0.023065   |
+| AAPL   | 0.000703         | 0.017276   |
+| JPM    | 0.000658         | 0.015378   |
+| KO     | 0.000413         | 0.010108   |
+| JNJ    | 0.000372         | 0.010613   |
+| XOM    | 0.000813         | 0.016823   |
+| BA     | -0.000043        | 0.023039   |
 
 ### Osservazioni
 
@@ -142,7 +142,28 @@ I p-value sono quasi tutti < 0.001; JNJ–BA ha p-value = 0.012, quindi è signi
 
 ---
 
-# Slide 7 – Applicazione del modello di Markowitz
+# Slide 7 – Matrice dei p-value formattati
+
+## Significatività statistica delle correlazioni
+
+|      | AAPL | JPM | KO | JNJ | XOM | BA |
+|------|------|------|------|------|------|------|
+| AAPL | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 |
+| JPM  | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 |
+| KO   | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 |
+| JNJ  | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | 0.012 |
+| XOM  | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 | <0.001 |
+| BA   | <0.001 | <0.001 | <0.001 | 0.012 | <0.001 | <0.001 |
+
+## Lettura della tabella
+
+* Valori molto piccoli indicano evidenza contro H₀: ρ = 0.
+* Tutte le correlazioni sono statisticamente significative al 5%.
+* La coppia JNJ–BA resta economicamente debole nonostante la significatività.
+
+---
+
+# Slide 8 – Applicazione del modello di Markowitz
 
 ## Metodologia
 
@@ -164,7 +185,7 @@ I p-value sono quasi tutti < 0.001; JNJ–BA ha p-value = 0.012, quindi è signi
 
 ---
 
-# Slide 8 – Portafogli ottimali
+# Slide 9 – Portafogli ottimali
 
 | Portafoglio     | Rendimento | Volatilità | Sharpe Ratio |
 | --------------- | ---------- | ---------- | ------------ |
@@ -184,7 +205,7 @@ Portafoglio a massimo Sharpe:
 
 ---
 
-# Slide 9 – Frontiera efficiente
+# Slide 10 – Frontiera efficiente
 
 ## Risultati dell’ottimizzazione
 
@@ -206,7 +227,7 @@ La frontiera efficiente rappresenta l’insieme dei portafogli che:
 
 ---
 
-# Slide 10 – Verifica fuori campione
+# Slide 11 – Verifica fuori campione
 
 ## Ultimo mese escluso dalla stima
 
@@ -226,7 +247,7 @@ Giorni di test: 14
 
 ---
 
-# Slide 11 – Conclusioni
+# Slide 12 – Conclusioni
 
 ## Conclusioni principali
 

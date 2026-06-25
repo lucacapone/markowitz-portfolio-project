@@ -72,9 +72,11 @@ Coerentemente con questa impostazione, tutte le statistiche descrittive successi
 
 L'analisi descrittiva costituisce una fase preliminare essenziale nello studio dei dati finanziari, poiché consente di sintetizzare le principali caratteristiche empiriche dei rendimenti prima dell'applicazione di modelli più strutturati di selezione di portafoglio. Le statistiche descrittive permettono di valutare il livello medio dei rendimenti, la dispersione attorno alla media, l'ampiezza degli estremi osservati e la forma della distribuzione. In questo modo è possibile individuare differenze rilevanti tra i titoli in termini di performance storica, volatilità e rischio di eventi estremi.
 
+Nella Figura 1 i prezzi sono normalizzati ponendo pari a 100 il valore iniziale di ciascuna serie. Questa trasformazione non modifica la dinamica relativa dei titoli, ma elimina l'effetto dei diversi livelli assoluti di prezzo e rende quindi confrontabili società con quotazioni iniziali molto differenti.
+
 ![Prezzi normalizzati](../figures/normalized_prices.png)
 
-*Figura 1. Andamento dei prezzi normalizzati dei titoli analizzati, utile per confrontare l'evoluzione relativa delle quotazioni nel periodo osservato.*
+*Figura 1. Andamento dei prezzi normalizzati dei titoli analizzati, utile per confrontare l'evoluzione relativa delle quotazioni nel periodo osservato su una base comune pari a 100.*
 
 ## 4.1 Statistiche descrittive dei rendimenti
 
@@ -87,7 +89,7 @@ L'analisi descrittiva costituisce una fase preliminare essenziale nello studio d
 | XOM | 0.000813 | 0.016823 | -0.082136 | 0.062142 | -0.316088 | 1.492777 |
 | BA | -0.000043 | 0.023039 | -0.110608 | 0.143010 | -0.150880 | 3.490003 |
 
-Le statistiche riportate evidenziano una significativa eterogeneità tra i rendimenti giornalieri dei sei titoli. In termini di rendimento medio, Exxon Mobil presenta il valore più elevato, pari a 0.000834, segnalando la performance media giornaliera più favorevole nel campione considerato. Anche JPMorgan Chase e Apple mostrano rendimenti medi positivi e relativamente elevati, rispettivamente pari a 0.000667 e 0.000660. Coca-Cola e Johnson & Johnson registrano rendimenti medi più contenuti, ma comunque positivi, coerentemente con la natura più difensiva dei rispettivi settori. Boeing, al contrario, presenta un rendimento medio negativo, pari a -0.000090, indicando che nel periodo osservato il titolo ha avuto una performance media giornaliera inferiore rispetto agli altri strumenti analizzati.
+La tabella delle statistiche descrittive va letta come una sintesi congiunta di rendimento medio, rischio e forma distributiva dei rendimenti logaritmici giornalieri. La media indica la direzione della performance storica media, la deviazione standard misura la volatilità giornaliera, minimo e massimo segnalano gli shock estremi osservati, mentre skewness e kurtosis aiutano a valutare asimmetria e peso delle code. Le statistiche riportate evidenziano una significativa eterogeneità tra i rendimenti giornalieri dei sei titoli. In termini di rendimento medio, Exxon Mobil presenta il valore più elevato, pari a 0.000834, segnalando la performance media giornaliera più favorevole nel campione considerato. Anche JPMorgan Chase e Apple mostrano rendimenti medi positivi e relativamente elevati, rispettivamente pari a 0.000667 e 0.000660. Coca-Cola e Johnson & Johnson registrano rendimenti medi più contenuti, ma comunque positivi, coerentemente con la natura più difensiva dei rispettivi settori. Boeing, al contrario, presenta un rendimento medio negativo, pari a -0.000090, indicando che nel periodo osservato il titolo ha avuto una performance media giornaliera inferiore rispetto agli altri strumenti analizzati.
 
 La deviazione standard consente di confrontare il grado di volatilità dei rendimenti. Boeing risulta il titolo più volatile, con una deviazione standard pari a 0.023065, segnalando una maggiore instabilità dei rendimenti giornalieri e una più ampia esposizione al rischio specifico. Apple, Exxon Mobil e JPMorgan Chase mostrano livelli di volatilità intermedi, mentre Coca-Cola e Johnson & Johnson presentano le deviazioni standard più basse, rispettivamente pari a 0.010202 e 0.010623. Tale evidenza è coerente con il profilo difensivo dei beni di consumo essenziali e del settore sanitario, che tendono a essere meno sensibili alle oscillazioni cicliche rispetto a comparti più esposti alla congiuntura economica.
 
@@ -98,6 +100,8 @@ La skewness fornisce informazioni sull'asimmetria della distribuzione dei rendim
 La kurtosis misura il grado di concentrazione della distribuzione e la rilevanza delle code rispetto a una distribuzione normale. I valori positivi e relativamente elevati osservati per Apple, Johnson & Johnson e JPMorgan Chase indicano distribuzioni leptocurtiche, caratterizzate da code più pesanti e quindi da una maggiore probabilità di rendimenti estremi. Anche Coca-Cola e Boeing presentano valori di kurtosis superiori a zero, confermando che gli eventi estremi non sono trascurabili. Exxon Mobil mostra una kurtosis più contenuta rispetto agli altri titoli, pur mantenendo una distribuzione non perfettamente assimilabile a quella normale.
 
 Nel complesso, i risultati descrittivi hanno implicazioni rilevanti per la costruzione del portafoglio. I titoli con rendimenti medi più elevati, come Exxon Mobil, JPMorgan Chase e Apple, possono contribuire all'incremento del rendimento atteso del portafoglio, ma devono essere valutati congiuntamente alla loro volatilità e alla forma della distribuzione dei rendimenti. I titoli più difensivi, come Coca-Cola e Johnson & Johnson, pur offrendo rendimenti medi inferiori, possono contribuire alla stabilizzazione del portafoglio grazie alla minore volatilità. Boeing, data la combinazione di rendimento medio negativo e volatilità elevata, richiede particolare attenzione nella fase di allocazione, poiché potrebbe aumentare il rischio complessivo senza offrire un adeguato contributo al rendimento atteso. Queste evidenze confermano l'importanza di combinare attività con caratteristiche differenti, affinché la selezione di portafoglio tenga conto non solo della performance media, ma anche della variabilità, dell'asimmetria e della probabilità di eventi estremi.
+
+Le serie dei rendimenti logaritmici giornalieri mostrate nella Figura 2 permettono di osservare direttamente gli shock giornalieri, cioè variazioni improvvise e di ampiezza rilevante rispetto alla normale oscillazione dei titoli. La concentrazione di movimenti ampi in determinati intervalli temporali segnala inoltre la volatilità dei rendimenti e la possibile presenza di cluster di volatilità, nei quali giornate turbolente tendono a essere seguite da altre giornate caratterizzate da forte instabilità.
 
 ![Rendimenti logaritmici giornalieri](../figures/log_returns.png)
 
@@ -126,7 +130,7 @@ La stima empirica delle relazioni tra i titoli è stata svolta nello script `src
 | XOM  | 0.183 | 0.301 | 0.166 | 0.118 | 1.000 | 0.204 |
 | BA   | 0.382 | 0.404 | 0.132 | 0.073 | 0.204 | 1.000 |
 
-La matrice di correlazione evidenzia che tutte le relazioni tra i titoli considerati sono positive, ma generalmente contenute. La correlazione più elevata si osserva tra Coca-Cola (KO) e Johnson & Johnson (JNJ), pari a 0.451. Tale valore indica una relazione positiva moderata tra due titoli appartenenti a settori difensivi, rispettivamente beni di consumo essenziali e sanità. Pur essendo la correlazione più alta del campione, essa rimane lontana da valori prossimi all'unità e non segnala quindi una sovrapposizione quasi perfetta dei movimenti dei rendimenti.
+La tabella della matrice di correlazione deve essere interpretata confrontando simultaneamente segno e ampiezza dei coefficienti: la diagonale principale è pari a 1 perché ogni titolo è perfettamente correlato con sé stesso, mentre gli elementi fuori diagonale indicano il grado di co-movimento lineare tra coppie di titoli. Valori più elevati riducono il beneficio potenziale della diversificazione, mentre valori prossimi a zero suggeriscono movimenti più indipendenti. La matrice di correlazione evidenzia che tutte le relazioni tra i titoli considerati sono positive, ma generalmente contenute. La correlazione più elevata si osserva tra Coca-Cola (KO) e Johnson & Johnson (JNJ), pari a 0.451. Tale valore indica una relazione positiva moderata tra due titoli appartenenti a settori difensivi, rispettivamente beni di consumo essenziali e sanità. Pur essendo la correlazione più alta del campione, essa rimane lontana da valori prossimi all'unità e non segnala quindi una sovrapposizione quasi perfetta dei movimenti dei rendimenti.
 
 La correlazione più bassa si registra tra Johnson & Johnson (JNJ) e Boeing (BA), pari a 0.073. Questo valore, molto vicino a zero, suggerisce una relazione lineare estremamente debole tra i rendimenti dei due titoli. Dal punto di vista della diversificazione, tale evidenza è rilevante perché indica che le variazioni di Boeing, titolo industriale e aerospaziale caratterizzato da maggiore volatilità, risultano scarsamente associate ai movimenti di Johnson & Johnson, società appartenente a un settore più difensivo.
 
@@ -135,6 +139,8 @@ Un elemento particolarmente significativo è l'assenza di correlazioni molto ele
 Questi risultati confermano la presenza di benefici di diversificazione all'interno dell'universo di titoli considerato. La combinazione di imprese appartenenti a settori differenti consente infatti di ridurre l'esposizione a shock specifici di singole società o comparti economici. Le correlazioni contenute indicano che i rendimenti non si muovono in modo perfettamente coordinato, rendendo possibile una riduzione del rischio complessivo attraverso un'adeguata scelta dei pesi di portafoglio.
 
 Nel complesso, la struttura delle correlazioni suggerisce che i titoli selezionati siano appropriati per la successiva costruzione di portafogli secondo l'approccio di Markowitz. L'eterogeneità settoriale e l'assenza di relazioni lineari eccessivamente elevate offrono una base empirica favorevole per l'analisi media-varianza. La matrice è inoltre rappresentata graficamente nella heatmap delle correlazioni generata durante l'analisi, salvata nel file `figures/correlation_heatmap.png`, che consente di visualizzare in modo immediato l'intensità relativa delle relazioni tra i rendimenti dei titoli.
+
+Nella Figura 3, colori e valori numerici rappresentano insieme intensità e direzione delle correlazioni di Pearson: tonalità più marcate e valori più lontani da zero indicano relazioni lineari più forti, mentre il segno del coefficiente distingue movimenti nella stessa direzione da movimenti in direzioni opposte.
 
 ![Heatmap delle correlazioni](../figures/correlation_heatmap.png)
 
@@ -198,7 +204,8 @@ Di conseguenza, le due matrici devono essere interpretate insieme:
 - la matrice di correlazione descrive **quanto forte e in quale direzione** sia il legame tra i titoli;
 - la matrice dei p-value valuta **quanto tale legame sia statisticamente affidabile**.
   
-La matrice dei p-value formattati è la seguente:
+La matrice dei p-value formattati è la seguente. Ogni cella va letta come evidenza statistica associata alla corrispondente coppia di titoli nella matrice di correlazione: valori molto piccoli indicano che il coefficiente stimato è difficilmente compatibile con l'ipotesi nulla di assenza di correlazione lineare, ma non misurano l'importanza economica del legame. Per questo motivo la tabella dei p-value rafforza, ma non sostituisce, l'interpretazione dei coefficienti di correlazione.
+
 
 |      | AAPL | JPM | KO | JNJ | XOM | BA |
 |------|------|------|------|------|------|------|
@@ -262,7 +269,8 @@ Il portafoglio a minima varianza rappresenta l'allocazione che, tra quelle ammis
 - Volatilità annualizzata = 12.73%
 - Sharpe Ratio = 0.894
 
-La composizione del portafoglio a minima varianza è riportata di seguito:
+La composizione del portafoglio a minima varianza è riportata di seguito. Questa tabella di pesi mostra come l'ottimizzazione traduca le stime di volatilità e covarianza in quote operative: pesi più elevati indicano attività che contribuiscono maggiormente alla riduzione del rischio complessivo, mentre pesi più bassi segnalano titoli meno utili per minimizzare la varianza dato l'insieme dei vincoli.
+
 
 - AAPL = 5.63%
 - JPM = 3.55%
@@ -283,7 +291,8 @@ Il portafoglio con massimo Sharpe Ratio è l'allocazione che massimizza il rendi
 - Volatilità annualizzata = 14.00%
 - Sharpe Ratio = 1.069
 
-La composizione del portafoglio con massimo Sharpe Ratio è la seguente:
+La composizione del portafoglio con massimo Sharpe Ratio è la seguente. In questo caso la tabella dei pesi non va letta come una semplice classifica dei rendimenti medi, ma come il risultato del compromesso tra contributo al rendimento atteso, volatilità individuale e capacità di diversificazione rispetto agli altri titoli.
+
 
 - AAPL = 15.68%
 - JPM = 14.75%
@@ -322,6 +331,8 @@ L’insieme dei portafogli ottenuti per i diversi livelli di rendimento target c
 
 La figura `figures/efficient_frontier.png` rappresenta la frontiera efficiente generata dall'analisi. Essa consente di confrontare visivamente i 10.000 portafogli simulati con le allocazioni efficienti. Il grafico aggiornato include inoltre una linea orizzontale che parte dal portafoglio a minima varianza: tale riferimento visivo separa la regione superiore, nella quale si collocano le combinazioni efficienti con rendimento atteso almeno pari a quello del portafoglio a minima varianza, dalla regione inferiore, associata a portafogli inefficienti perché dominati in termini di rendimento atteso a parità o quasi parità di rischio. I portafogli casuali occupano un'area più ampia del piano rischio-rendimento e includono molte combinazioni subottimali; la frontiera efficiente, invece, individua il bordo superiore di tale insieme, ossia le combinazioni che offrono le migliori opportunità disponibili. Il confronto tra portafogli simulati e portafogli efficienti mostra quindi come l'ottimizzazione di Markowitz consenta di selezionare allocazioni superiori rispetto a scelte casuali dei pesi, mantenendo i vincoli di assenza di vendite allo scoperto e di pesi compresi tra 0 e 1.
 
+Nel grafico della Figura 4, i punti dispersi rappresentano portafogli casuali simulati scegliendo diverse combinazioni di pesi long-only, mentre la curva rossa rappresenta la frontiera efficiente ottenuta tramite ottimizzazione. I punti speciali evidenziano il portafoglio a minima varianza e quello con massimo Sharpe Ratio; la linea orizzontale, tracciata dal rendimento del portafoglio a minima varianza, aiuta a distinguere visivamente la regione efficiente, posta sul tratto superiore della frontiera, dalle combinazioni dominate o meno interessanti sotto il profilo media-varianza.
+
 ![Frontiera efficiente](../figures/efficient_frontier.png)
 
 *Figura 4. Frontiera efficiente dei portafogli simulati, con linea orizzontale dal portafoglio a minima varianza e distinzione visiva tra regione efficiente e regione inefficiente.*
@@ -339,6 +350,8 @@ Dal punto di vista metodologico, il rendimento mensile semplice atteso deriva da
 Il rendimento mensile semplice realizzato, invece, è stato calcolato utilizzando i rendimenti effettivamente osservati nel periodo di test. In particolare, i rendimenti logaritmici giornalieri sono stati sommati nel periodo considerato, sfruttando la loro proprietà di additività nel tempo, e successivamente convertiti in rendimento semplice. Infine, il rendimento realizzato del portafoglio è stato ottenuto combinando i rendimenti realizzati dei singoli titoli con i pesi stimati nel campione di training. In questo modo, il confronto tra rendimento atteso e rendimento realizzato consente di valutare la capacità dei portafogli costruiti sui dati storici di produrre risultati coerenti anche fuori campione.
 
 Più precisamente, per ciascun portafoglio lo script calcola dapprima il rendimento logaritmico medio giornaliero atteso come prodotto tra il vettore dei pesi e la media dei rendimenti logaritmici del training set. Tale valore viene moltiplicato per il numero effettivo di giorni di negoziazione nel test e poi trasformato in rendimento semplice mediante \(\exp(r)-1\). Il rendimento realizzato segue la stessa logica di conversione: i rendimenti logaritmici giornalieri del portafoglio nel test vengono sommati e quindi convertiti in rendimento semplice. L'errore di previsione è infine definito come differenza tra rendimento semplice realizzato e rendimento semplice atteso.
+
+La tabella della verifica fuori campione confronta per ciascun portafoglio il rendimento previsto sulla base delle stime del training set con il rendimento effettivamente realizzato nel periodo di test. L'errore di previsione misura la differenza tra risultato realizzato e risultato atteso: valori negativi indicano sottoperformance rispetto alla previsione, mentre il numero di giorni di test chiarisce l'orizzonte temporale effettivo del confronto.
 
 | Portafoglio | Rendimento mensile semplice atteso | Rendimento mensile semplice realizzato | Errore di previsione | Giorni di test |
 |-------------|------------------------------------|----------------------------------------|----------------------|----------------|

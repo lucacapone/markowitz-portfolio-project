@@ -305,7 +305,58 @@ Rispetto al portafoglio a minima varianza, questa allocazione assegna un peso pi
 
 Boeing risulta quasi esclusa dal portafoglio con massimo Sharpe Ratio, con un peso pari allo 0.08%. Tale risultato riflette la combinazione sfavorevole tra rendimento medio storico negativo e volatilità elevata. In un'ottica media-varianza, un titolo con elevata dispersione dei rendimenti può essere incluso solo se offre un contributo adeguato al rendimento atteso oppure benefici di diversificazione sufficientemente rilevanti. Nel caso di BA, tali benefici non risultano sufficienti a compensare il profilo rischio-rendimento sfavorevole; di conseguenza, l'ottimizzazione tende ad assegnargli un peso pressoché nullo.
 
-## 7.3 Frontiera efficiente
+## 7.3 Confronto tra portafogli simulati e portafogli ottimizzati
+
+La selezione iniziale dei portafogli è stata effettuata mediante la simulazione di 10.000 portafogli casuali ammissibili. In questo approccio, i pesi sono generati casualmente, normalizzati affinché la loro somma sia pari a uno e vincolati all'intervallo $0 \leq w_i \leq 1$, escludendo quindi vendite allo scoperto. Il portafoglio a minima varianza e quello con massimo Sharpe Ratio discussi nelle sezioni precedenti derivano da questa esplorazione simulata dello spazio delle allocazioni.
+
+Come controllo di robustezza aggiuntivo, gli stessi due portafogli sono stati calcolati anche tramite ottimizzazione numerica diretta. Per il portafoglio a minima varianza ottimizzato è stato risolto il seguente problema:
+
+$$
+\min_w \quad w^T \Sigma w
+$$
+
+soggetto a:
+
+$$
+\sum_{i=1}^{n} w_i = 1
+$$
+
+$$
+0 \leq w_i \leq 1
+$$
+
+Per il portafoglio ottimizzato con massimo Sharpe Ratio, assumendo un tasso privo di rischio pari a zero coerentemente con il resto dell'analisi, è stata minimizzata la funzione opposta allo Sharpe Ratio:
+
+$$
+\min_w \quad - \frac{w^T \mu}{\sqrt{w^T \Sigma w}}
+$$
+
+soggetto a:
+
+$$
+\sum_{i=1}^{n} w_i = 1
+$$
+
+$$
+0 \leq w_i \leq 1
+$$
+
+La differenza principale tra i due approcci è di natura computazionale. La simulazione ricerca la soluzione migliore tra 10.000 portafogli ammissibili generati casualmente e fornisce quindi una soluzione approssimata. L'ottimizzazione, invece, risolve direttamente il problema matematico vincolato e tende a produrre una soluzione numericamente più precisa, pur rimanendo soggetta alle stesse ipotesi sui rendimenti attesi, sulla matrice di covarianza e sui vincoli long-only.
+
+La tabella seguente riporta il confronto salvato in `outputs/portfolios/portfolio_optimization_comparison.csv`.
+
+| Portfolio                   | Return   | Volatility | Sharpe Ratio | AAPL weight | JPM weight | KO weight | JNJ weight | XOM weight | BA weight |
+| --------------------------- | -------- | ---------- | ------------ | ----------- | ---------- | --------- | ---------- | ---------- | --------- |
+| Simulation Minimum Variance | 0.113770 | 0.127310   | 0.893648     | 0.056262    | 0.035482   | 0.377921  | 0.349045   | 0.129126   | 0.052164  |
+| Optimized Minimum Variance  | 0.119207 | 0.126561   | 0.941894     | 0.056167    | 0.097946   | 0.346187  | 0.356417   | 0.116558   | 0.026725  |
+| Simulation Maximum Sharpe   | 0.149680 | 0.140006   | 1.069098     | 0.156755    | 0.147452   | 0.192153  | 0.229768   | 0.273105   | 0.000767  |
+| Optimized Maximum Sharpe    | 0.148773 | 0.138835   | 1.071586     | 0.150177    | 0.151965   | 0.240818  | 0.195368   | 0.261672   | 0.000000  |
+
+I risultati mostrano che i portafogli ottimizzati sono complessivamente vicini a quelli individuati tramite simulazione, ma non coincidono perfettamente. Per il portafoglio a minima varianza, l'ottimizzazione produce una volatilità leggermente inferiore rispetto alla simulazione, come atteso, poiché l'algoritmo ricerca direttamente il minimo della varianza nello spazio ammissibile invece di limitarsi ai portafogli estratti casualmente. Anche nel caso del massimo Sharpe Ratio, il valore ottimizzato dello Sharpe Ratio risulta lievemente superiore a quello ottenuto dalla simulazione, confermando che la procedura numerica può migliorare o almeno eguagliare la migliore soluzione trovata casualmente.
+
+Le differenze osservate dipendono dal fatto che la simulazione considera un numero finito di combinazioni casuali: anche con 10.000 portafogli, non è garantito che uno dei punti simulati coincida esattamente con l'ottimo matematico. L'ottimizzazione è quindi utile come verifica della qualità dei risultati simulati e consente di valutare quanto le soluzioni casuali siano prossime agli ottimi vincolati. Entrambi gli approcci sono coerenti con il quadro di Markowitz, poiché utilizzano gli stessi input, gli stessi vincoli di pieno investimento e assenza di vendite allo scoperto, e misurano i portafogli in termini di rendimento atteso, volatilità e Sharpe Ratio.
+
+## 7.4 Frontiera efficiente
 
 La frontiera efficiente sintetizza graficamente la relazione tra rischio e rendimento atteso per l'insieme dei portafogli ammissibili. Nel piano rischio-rendimento, ciascun portafoglio è rappresentato da una coppia formata dalla volatilità annua e dal rendimento annuo atteso. In generale, portafogli con rendimento atteso più elevato richiedono l'assunzione di un rischio maggiore, mentre portafogli con volatilità più contenuta tendono a offrire rendimenti attesi inferiori. Tuttavia, la relazione non è meccanica, poiché la diversificazione consente di modificare il rischio complessivo attraverso la combinazione di attività non perfettamente correlate.
 
@@ -339,7 +390,7 @@ Nel grafico della Figura 4, i punti dispersi rappresentano portafogli casuali si
 
 
 
-## 7.4 Verifica fuori campione sull'ultimo mese
+## 7.5 Verifica fuori campione sull'ultimo mese
 
 La separazione tra campione di training e campione di test consente di valutare se i portafogli ottimali, costruiti utilizzando soltanto le informazioni disponibili fino al 29 maggio 2026, mantengano una performance coerente anche nel mese successivo, escluso dalla stima. La verifica fuori campione è condotta sul periodo dal 1 giugno 2026 al 22 giugno 2026, pari a 14 giorni di negoziazione, confrontando il rendimento mensile semplice atteso con il rendimento mensile semplice effettivamente realizzato.
 

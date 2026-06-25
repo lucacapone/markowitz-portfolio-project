@@ -26,6 +26,15 @@ MINIMUM_VARIANCE_PATH = PORTFOLIOS_DIR / "minimum_variance_portfolio.csv"
 MAXIMUM_SHARPE_PATH = PORTFOLIOS_DIR / "maximum_sharpe_portfolio.csv"
 EFFICIENT_FRONTIER_PATH = PORTFOLIOS_DIR / "efficient_frontier.csv"
 OUT_OF_SAMPLE_EVALUATION_PATH = PORTFOLIOS_DIR / "out_of_sample_evaluation.csv"
+OPTIMIZED_MINIMUM_VARIANCE_PATH = (
+    PORTFOLIOS_DIR / "minimum_variance_portfolio_optimized.csv"
+)
+OPTIMIZED_MAXIMUM_SHARPE_PATH = (
+    PORTFOLIOS_DIR / "maximum_sharpe_portfolio_optimized.csv"
+)
+PORTFOLIO_OPTIMIZATION_COMPARISON_PATH = (
+    PORTFOLIOS_DIR / "portfolio_optimization_comparison.csv"
+)
 EFFICIENT_FRONTIER_FIGURE_PATH = FIGURES_DIR / "efficient_frontier.png"
 
 
@@ -114,6 +123,116 @@ def find_extreme_portfolios(
     minimum_variance = portfolios.loc[[portfolios["Volatility"].idxmin()]]
     maximum_sharpe = portfolios.loc[[portfolios["Sharpe Ratio"].idxmax()]]
     return minimum_variance, maximum_sharpe
+
+
+def optimize_minimum_variance_portfolio(
+    annual_returns: pd.Series,
+    annual_covariance_matrix: pd.DataFrame,
+) -> pd.DataFrame:
+    """Compute the long-only minimum variance portfolio by optimization.
+
+    This optimized portfolio is added only as a comparison benchmark and does
+    not replace the minimum variance portfolio selected from the simulations.
+    """
+    n_assets = len(annual_returns)
+    bounds = [(0.0, 1.0)] * n_assets
+    initial_weights = np.repeat(1.0 / n_assets, n_assets)
+    constraints = {"type": "eq", "fun": lambda weights: np.sum(weights) - 1.0}
+
+    def portfolio_variance(weights: np.ndarray) -> float:
+        covariance_matrix = annual_covariance_matrix.to_numpy()
+        return float(weights.T @ covariance_matrix @ weights)
+
+    result = minimize(
+        portfolio_variance,
+        initial_weights,
+        method="SLSQP",
+        bounds=bounds,
+        constraints=constraints,
+    )
+
+    if not result.success:
+        raise ValueError(f"Minimum variance optimization failed: {result.message}")
+
+    return build_portfolio_summary(result.x, annual_returns, annual_covariance_matrix)
+
+
+def optimize_maximum_sharpe_portfolio(
+    annual_returns: pd.Series,
+    annual_covariance_matrix: pd.DataFrame,
+) -> pd.DataFrame:
+    """Compute the long-only maximum Sharpe Ratio portfolio by optimization.
+
+    The risk-free rate is zero, consistently with the simulation. This optimized
+    portfolio is added only for comparison and does not replace the simulated
+    maximum Sharpe Ratio portfolio.
+    """
+    n_assets = len(annual_returns)
+    bounds = [(0.0, 1.0)] * n_assets
+    initial_weights = np.repeat(1.0 / n_assets, n_assets)
+    constraints = {"type": "eq", "fun": lambda weights: np.sum(weights) - 1.0}
+
+    def negative_sharpe_ratio(weights: np.ndarray) -> float:
+        return -compute_portfolio_metrics(
+            weights, annual_returns, annual_covariance_matrix
+        )[2]
+
+    result = minimize(
+        negative_sharpe_ratio,
+        initial_weights,
+        method="SLSQP",
+        bounds=bounds,
+        constraints=constraints,
+    )
+
+    if not result.success:
+        raise ValueError(f"Maximum Sharpe optimization failed: {result.message}")
+
+    return build_portfolio_summary(result.x, annual_returns, annual_covariance_matrix)
+
+
+def build_portfolio_summary(
+    weights: np.ndarray,
+    annual_returns: pd.Series,
+    annual_covariance_matrix: pd.DataFrame,
+) -> pd.DataFrame:
+    """Create a one-row summary with metrics and weights."""
+    portfolio_return, portfolio_volatility, sharpe_ratio = compute_portfolio_metrics(
+        weights, annual_returns, annual_covariance_matrix
+    )
+    columns = [
+        "Return",
+        "Volatility",
+        "Sharpe Ratio",
+        *[f"{ticker} weight" for ticker in annual_returns.index],
+    ]
+    return pd.DataFrame(
+        [[portfolio_return, portfolio_volatility, sharpe_ratio, *weights]],
+        columns=columns,
+    )
+
+
+def build_portfolio_optimization_comparison(
+    minimum_variance: pd.DataFrame,
+    optimized_minimum_variance: pd.DataFrame,
+    maximum_sharpe: pd.DataFrame,
+    optimized_maximum_sharpe: pd.DataFrame,
+) -> pd.DataFrame:
+    """Compare simulated portfolios with the additional optimized portfolios."""
+    comparison_inputs = [
+        ("Simulation Minimum Variance", minimum_variance),
+        ("Optimized Minimum Variance", optimized_minimum_variance),
+        ("Simulation Maximum Sharpe", maximum_sharpe),
+        ("Optimized Maximum Sharpe", optimized_maximum_sharpe),
+    ]
+    records = []
+
+    for portfolio_name, portfolio in comparison_inputs:
+        record = portfolio.iloc[0].to_dict()
+        record = {"Portfolio": portfolio_name, **record}
+        records.append(record)
+
+    return pd.DataFrame(records)
 
 
 def build_efficient_frontier(
@@ -315,6 +434,21 @@ def main() -> None:
     portfolios = simulate_random_portfolios(annual_returns, annual_covariance_matrix)
     minimum_variance, maximum_sharpe = find_extreme_portfolios(portfolios)
     efficient_frontier = build_efficient_frontier(annual_returns, annual_covariance_matrix)
+    # Calcoliamo anche i portafogli ottimizzati come confronto aggiuntivo:
+    # questi risultati non sostituiscono i portafogli individuati tramite
+    # simulazione casuale, ma permettono di confrontare i due approcci.
+    optimized_minimum_variance = optimize_minimum_variance_portfolio(
+        annual_returns, annual_covariance_matrix
+    )
+    optimized_maximum_sharpe = optimize_maximum_sharpe_portfolio(
+        annual_returns, annual_covariance_matrix
+    )
+    portfolio_optimization_comparison = build_portfolio_optimization_comparison(
+        minimum_variance,
+        optimized_minimum_variance,
+        maximum_sharpe,
+        optimized_maximum_sharpe,
+    )
     # Valutiamo fuori campione i portafogli scelti sul training set.
     out_of_sample_evaluation = evaluate_out_of_sample(
         {
@@ -330,6 +464,11 @@ def main() -> None:
     minimum_variance.to_csv(MINIMUM_VARIANCE_PATH, index=False)
     maximum_sharpe.to_csv(MAXIMUM_SHARPE_PATH, index=False)
     efficient_frontier.to_csv(EFFICIENT_FRONTIER_PATH, index=False)
+    optimized_minimum_variance.to_csv(OPTIMIZED_MINIMUM_VARIANCE_PATH, index=False)
+    optimized_maximum_sharpe.to_csv(OPTIMIZED_MAXIMUM_SHARPE_PATH, index=False)
+    portfolio_optimization_comparison.to_csv(
+        PORTFOLIO_OPTIMIZATION_COMPARISON_PATH, index=False
+    )
     out_of_sample_evaluation.to_csv(OUT_OF_SAMPLE_EVALUATION_PATH, index=False)
     plot_efficient_frontier(
         portfolios,
@@ -343,6 +482,8 @@ def main() -> None:
     print(minimum_variance.to_string(index=False))
     print("\nMaximum Sharpe portfolio summary:")
     print(maximum_sharpe.to_string(index=False))
+    print("\nPortfolio optimization comparison:")
+    print(portfolio_optimization_comparison.to_string(index=False))
     print("\nOut-of-sample evaluation:")
     print(out_of_sample_evaluation.to_string(index=False))
     print("\nFiles created:")
@@ -351,6 +492,9 @@ def main() -> None:
         MINIMUM_VARIANCE_PATH,
         MAXIMUM_SHARPE_PATH,
         EFFICIENT_FRONTIER_PATH,
+        OPTIMIZED_MINIMUM_VARIANCE_PATH,
+        OPTIMIZED_MAXIMUM_SHARPE_PATH,
+        PORTFOLIO_OPTIMIZATION_COMPARISON_PATH,
         OUT_OF_SAMPLE_EVALUATION_PATH,
         EFFICIENT_FRONTIER_FIGURE_PATH,
     ):

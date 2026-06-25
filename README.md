@@ -2,7 +2,7 @@
 
 ## Objective
 
-Analyze six diversified stocks, compute log returns, descriptive statistics, correlations, and build efficient portfolios using the Markowitz mean-variance model.
+Analyze six diversified stocks, compute log returns, descriptive statistics, correlations, and build efficient portfolios using the Markowitz mean-variance model. The project includes simulation-based portfolio selection, optimization-based portfolio selection, and a comparison between the two methods.
 
 ## Stocks
 
@@ -72,5 +72,8 @@ The following scripts consume those files and regenerate the descriptive tables,
 - `outputs/tables/correlation_pvalues.csv`
 - `outputs/tables/correlation_significance.csv`
 - `outputs/portfolios/out_of_sample_evaluation.csv`
+- `outputs/portfolios/minimum_variance_portfolio_optimized.csv`
+- `outputs/portfolios/maximum_sharpe_portfolio_optimized.csv`
+- `outputs/portfolios/portfolio_optimization_comparison.csv`
 
 Correlation heatmap labels include significance stars based on Pearson correlation p-values.

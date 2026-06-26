@@ -33,7 +33,6 @@ markowitz-portfolio-project/
 │   ├── tables/
 │   └── portfolios/
 ├── report/
-├── slides/
 ├── src/
 │   ├── 01_download_data.py
 │   ├── 02_descriptive_analysis.py

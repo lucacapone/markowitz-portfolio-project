@@ -33,14 +33,14 @@ def compute_correlation_matrix(log_returns: pd.DataFrame) -> pd.DataFrame:
 
 def compute_pvalue_matrix(log_returns: pd.DataFrame) -> pd.DataFrame:
     """Compute Pearson correlation p-values for each pair of return series."""
-    # Inizializziamo una matrice con gli stessi ticker su righe e colonne.
+    # Initialize a matrix with the same tickers as rows and columns.
     p_values = pd.DataFrame(
         index=log_returns.columns,
         columns=log_returns.columns,
         dtype=float,
     )
 
-    # Calcoliamo il p-value di Pearson per ogni coppia di asset.
+    # Compute the Pearson p-value for each asset pair.
     for row_name in log_returns.columns:
         for column_name in log_returns.columns:
             _, p_value = stats.pearsonr(log_returns[row_name], log_returns[column_name])
@@ -82,7 +82,7 @@ def plot_correlation_heatmap(
     output_path: Path,
 ) -> None:
     """Create a matplotlib heatmap with Pearson correlation values."""
-    # La scala va da -1 a 1 per rappresentare correttamente le correlazioni.
+    # Use a -1 to 1 scale to represent correlations correctly.
     fig, ax = plt.subplots(figsize=(8, 6))
     image = ax.imshow(correlation_matrix, cmap="coolwarm", vmin=-1, vmax=1)
 
@@ -92,7 +92,7 @@ def plot_correlation_heatmap(
     ax.set_yticks(range(len(correlation_matrix.index)))
     ax.set_yticklabels(correlation_matrix.index)
 
-    # Scriviamo il valore numerico dentro ogni cella della heatmap.
+    # Write the numeric value inside each heatmap cell.
     for row_index, row_name in enumerate(correlation_matrix.index):
         for column_index, column_name in enumerate(correlation_matrix.columns):
             value = correlation_matrix.loc[row_name, column_name]
@@ -115,18 +115,18 @@ def plot_correlation_heatmap(
 
 def main() -> None:
     """Compute correlations for log returns and save the table and heatmap."""
-    # Prepariamo le cartelle dove salvare CSV e grafico.
+    # Prepare folders for saving CSV files and the chart.
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Carichiamo i rendimenti e calcoliamo correlazioni, p-value e significatività.
+    # Load returns and compute correlations, p-values, and significance.
     log_returns = read_log_returns(LOG_RETURNS_PATH)
     correlation_matrix = compute_correlation_matrix(log_returns)
     pvalue_matrix = compute_pvalue_matrix(log_returns)
     formatted_pvalue_matrix = compute_formatted_pvalue_matrix(pvalue_matrix)
     significance_matrix = compute_significance_matrix(pvalue_matrix)
 
-    # Salviamo sia i valori numerici sia le versioni formattate per il report.
+    # Save numeric values and report-formatted versions.
     correlation_matrix.to_csv(CORRELATION_MATRIX_PATH)
     pvalue_matrix.to_csv(CORRELATION_PVALUES_PATH)
     formatted_pvalue_matrix.to_csv(CORRELATION_PVALUES_FORMATTED_PATH)

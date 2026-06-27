@@ -264,7 +264,7 @@ The minimum-variance portfolio and the maximum Sharpe Ratio portfolio are identi
 
 ## 7.1 Minimum-variance portfolio
 
-The minimum-variance portfolio represents the allocation that, among feasible allocations, achieves the lowest overall volatility. The estimated results for this portfolio are as follows:
+The minimum-variance portfolio reported in this section represents the allocation that, among the 10,000 simulated feasible portfolios, achieves the lowest overall volatility. The estimated results for this portfolio are as follows:
 
 - Annualized expected return = 11.38%
 - Annualized volatility = 12.73%
@@ -286,7 +286,7 @@ The high weight assigned to KO and JNJ should not be interpreted only as a conse
 
 ## 7.2 Maximum Sharpe Ratio portfolio
 
-The maximum Sharpe Ratio portfolio is the allocation that maximizes expected return per unit of risk, assuming a risk-free rate equal to zero. It does not necessarily coincide with the least risky portfolio, because the objective is to improve the relationship between return and volatility. The results obtained are as follows:
+The maximum Sharpe Ratio portfolio reported in this section represents the allocation that, among the 10,000 simulated feasible portfolios, achieves the highest expected return per unit of risk, assuming a risk-free rate equal to zero. It does not necessarily coincide with the least risky portfolio, because the objective is to improve the relationship between return and volatility. The results obtained are as follows:
 
 - Annualized expected return = 14.97%
 - Annualized volatility = 14.00%

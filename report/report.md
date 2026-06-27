@@ -123,18 +123,18 @@ The empirical estimation of the relationships among securities was carried out i
 
 |      | AAPL | JPM | KO | JNJ | XOM | BA |
 |------|------|------|------|------|------|------|
-| AAPL | 1.000 | 0.375 | 0.257 | 0.151 | 0.183 | 0.382 |
-| JPM  | 0.375 | 1.000 | 0.203 | 0.189 | 0.301 | 0.404 |
-| KO   | 0.257 | 0.203 | 1.000 | 0.451 | 0.166 | 0.132 |
-| JNJ  | 0.151 | 0.189 | 0.451 | 1.000 | 0.118 | 0.073 |
-| XOM  | 0.183 | 0.301 | 0.166 | 0.118 | 1.000 | 0.204 |
-| BA   | 0.382 | 0.404 | 0.132 | 0.073 | 0.204 | 1.000 |
+| AAPL | 1.000 | 0.378 | 0.268 | 0.156 | 0.187 | 0.384 |
+| JPM  | 0.378 | 1.000 | 0.210 | 0.183 | 0.304 | 0.404 |
+| KO   | 0.268 | 0.210 | 1.000 | 0.451 | 0.168 | 0.142 |
+| JNJ  | 0.156 | 0.183 | 0.451 | 1.000 | 0.122 | 0.071 |
+| XOM  | 0.187 | 0.304 | 0.168 | 0.122 | 1.000 | 0.210 |
+| BA   | 0.384 | 0.404 | 0.142 | 0.071 | 0.210 | 1.000 |
 
 The correlation matrix table should be interpreted by jointly comparing the sign and magnitude of the coefficients: the main diagonal is equal to 1 because each security is perfectly correlated with itself, while off-diagonal elements indicate the degree of linear co-movement between pairs of securities. Higher values reduce the potential benefit of diversification, while values close to zero suggest more independent movements. The correlation matrix shows that all relationships among the securities considered are positive, but generally limited. The highest correlation is observed between Coca-Cola (KO) and Johnson & Johnson (JNJ), equal to 0.451. This value indicates a moderate positive relationship between two securities belonging to defensive sectors, consumer staples and health care, respectively. Although it is the highest correlation in the sample, it remains far from values close to unity and therefore does not indicate an almost perfect overlap in return movements.
 
-The lowest correlation is recorded between Johnson & Johnson (JNJ) and Boeing (BA), equal to 0.073. This value, very close to zero, suggests an extremely weak linear relationship between the returns of the two securities. From a diversification perspective, this evidence is relevant because it indicates that Boeing's movements, as an industrial and aerospace stock characterized by higher volatility, are only weakly associated with the movements of Johnson & Johnson, a company belonging to a more defensive sector.
+The lowest correlation is recorded between Johnson & Johnson (JNJ) and Boeing (BA), equal to 0.071. This value, very close to zero, suggests an extremely weak linear relationship between the returns of the two securities. From a diversification perspective, this evidence is relevant because it indicates that Boeing's movements, as an industrial and aerospace stock characterized by higher volatility, are only weakly associated with the movements of Johnson & Johnson, a company belonging to a more defensive sector.
 
-A particularly significant element is the absence of very high correlations among the selected assets. No pair of securities has values close to 0.80 or 0.90, thresholds that would indicate strong linear dependence and a consequent reduction in diversification benefits. Even the relatively higher correlations, such as JPMorgan Chase (JPM) with Boeing (BA), equal to 0.404, and Apple (AAPL) with Boeing (BA), equal to 0.382, remain at moderate levels.
+A particularly significant element is the absence of very high correlations among the selected assets. No pair of securities has values close to 0.80 or 0.90, thresholds that would indicate strong linear dependence and a consequent reduction in diversification benefits. Even the relatively higher correlations, such as JPMorgan Chase (JPM) with Boeing (BA), equal to 0.404, and Apple (AAPL) with Boeing (BA), equal to 0.384, remain at moderate levels.
 
 These results confirm the presence of diversification benefits within the universe of securities considered. The combination of firms belonging to different sectors makes it possible to reduce exposure to shocks specific to individual companies or economic segments. The limited correlations indicate that returns do not move in a perfectly coordinated manner, making it possible to reduce overall risk through an appropriate choice of portfolio weights.
 

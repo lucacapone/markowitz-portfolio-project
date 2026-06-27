@@ -387,7 +387,7 @@ def plot_efficient_frontier(
         colors="blue",
         linestyles="--",
         linewidth=1.5,
-        label="Rendimento del portafoglio a minima varianza",
+        label="Minimum Variance Portfolio Return",
     )
     # Highlight the portfolio with the best return-to-risk ratio.
     ax.scatter(
